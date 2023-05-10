@@ -4,6 +4,7 @@ import { SQuery } from "../../lib/squery/SQuery";
 import AccountModel from "./AccountModel";
 import MessengerModel from "./MessengerModel";
 import TransactionModel from "./Transaction";
+import UserPreferenceModel from "./UserPreference";
 
 let userSchema = SQuery.Schema({
   account: {
@@ -14,7 +15,7 @@ let userSchema = SQuery.Schema({
     type: Schema.Types.ObjectId,
     ref: TransactionModel.modelName,
   },
-  transaction: [
+  transactions: [
     {
       type: Schema.Types.ObjectId,
       ref: TransactionModel.modelName,
@@ -25,6 +26,10 @@ let userSchema = SQuery.Schema({
     ref: MessengerModel.modelName,
     access: "private",
   },
+  preference:{
+    type:Schema.Types.ObjectId,
+    ref:UserPreferenceModel.modelName
+  }
 });
 
 const UserModel = mongoose.model("user", userSchema);

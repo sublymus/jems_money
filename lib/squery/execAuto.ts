@@ -4,7 +4,6 @@ import Log from "sublymus_logger";
 console.log(Config);
 const relativeDir =__dirname.replace(Config.conf.rootDir,'')
 const systemDir = [relativeDir+'/Start'];
-Log('log',{relativeDir , systemDir});
 [...systemDir,...Config.conf.execDir].forEach(exec)
 
 async function exec(directory: string) {

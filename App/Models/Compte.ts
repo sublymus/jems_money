@@ -2,10 +2,12 @@ import mongoose, { Schema } from "mongoose";
 import { MakeModelCtlForm } from "../../lib/squery/ModelCtrlManager";
 import { SQuery } from "../../lib/squery/SQuery";
 import AgenceModel from "./AgenceModel";
+import CountryModel from "./CountryModel";
 
 let CompteSchema = SQuery.Schema({
     counrty:{
-        type:String,
+        type:Schema.Types.ObjectId,
+        ref:CountryModel.modelName,
         required:true,
     },
     type:{

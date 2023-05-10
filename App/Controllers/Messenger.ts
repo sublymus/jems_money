@@ -33,7 +33,6 @@ const Messenger: ControllerSchema = {
             const discussion = await ModelControllers['discussion'].option.model.findOne({ receiver: receiverId, sender: ctx.login.id });
             let channel: any;
             if (!discussion) {
-
                 const resChannel = await ModelControllers['channel']()['create']({
                     ...ctx,
                     data: {
@@ -43,7 +42,6 @@ const Messenger: ControllerSchema = {
                         users: []
                     }
                 });
-
                 if (resChannel.error) return resChannel;
                 channel = resChannel.response.toString();
             } else {

@@ -3,10 +3,24 @@ import { SQueryMongooseSchema } from "../../lib/squery/Initialize";
 import { MakeModelCtlForm } from "../../lib/squery/ModelCtrlManager";
 import { SQuery } from "../../lib/squery/SQuery";
 import UserModel from "./UserModel";
+import AccountModel from "./AccountModel";
+import MessengerModel from "./MessengerModel";
+import ManagerPreferenceModel from "./ManagerPreference";
 
 const managerSchema = SQuery.Schema({
-  ...(UserModel.schema as SQueryMongooseSchema).description,
-  
+  account: {
+    type: Schema.Types.ObjectId,
+    ref: AccountModel.modelName,
+  },
+  messenger: {
+    type: Schema.Types.ObjectId,
+    ref: MessengerModel.modelName,
+    access: "private",
+  },
+  preference:{
+    type:Schema.Types.ObjectId,
+    ref:ManagerPreferenceModel.modelName
+  }
 });
 export const ManagerModel = mongoose.model("manager", managerSchema);
 

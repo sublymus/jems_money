@@ -2,19 +2,25 @@ import mongoose, { Schema } from "mongoose";
 import { MakeModelCtlForm } from "../../lib/squery/ModelCtrlManager";
 import { SQuery } from "../../lib/squery/SQuery";
 import MessageModel from "./MessageModel";
+import AccountModel from "./AccountModel";
+import { ModelControllers } from "../../lib/squery/Initialize";
 
 let ContactSchema = SQuery.Schema({
-    pays:{
-        type:String,
+    country: {
+        type: String,
     },
-    number:{
-        type:String,
+    telephone: {
+        type: String,
     },
-    carte:{
-        type:String
+    carte: {
+        type: String
     },
-    agence:{
-        type:String
+    agence: {
+        type: String
+    },
+    account: {
+        type: Schema.Types.ObjectId,
+        ref: AccountModel.modelName
     }
 });
 
@@ -26,17 +32,16 @@ const ctrlMaker = MakeModelCtlForm({
     volatile: true,
 });
 
-ctrlMaker.pre('read', async (e) => {
-    /*
-    TODO: pre:create 
-    TODO: read:create 
-    TODO: delete:create 
-    TODO: update:create 
-    TODO: access- droit
-    */
+ctrlMaker.pre('read', async ({ ctx }) => {
+    if (ctx.data.telephone) {
+        const account = await  ModelControllers['account'].option.model.findOne({
+            telephone: ctx.data.telephone
+        });
+        if(account){
+            ctx.data.account = account._id.toString();
+        }
+    }
 })
-ctrlMaker.post('read', async (e) => {
 
-})
 
 export default ContactModel;

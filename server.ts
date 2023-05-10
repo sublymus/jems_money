@@ -18,11 +18,9 @@ const server = app.listen(PORT, () => {
 
 app.use(cors());
 
+
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/views/index.html"));
-});
-app.get("/test", (req, res) => {
-  res.sendFile(path.join(__dirname, "Public/views/test.html"));
+  res.redirect("/test.html");
 });
 
 app.get("*", async (req, res) => {

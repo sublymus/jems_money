@@ -37,6 +37,4 @@ const maker = MakeModelCtlForm({
   volatile: true,
 });
 
-maker.pre("create", async ({ ctx }) => {
-});
 export default DiscussionModel;

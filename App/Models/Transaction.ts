@@ -13,33 +13,26 @@ const TransactionSchema = SQuery.Schema({
     type: Schema.Types.ObjectId,
     ref:AccountModel.modelName,
     impact:false,
-    required: true,
-    strictAlien: true,
     access:'admin',
   },
   receiver: {
     type: Schema.Types.ObjectId,
     ref: ContactModel.modelName,
     impact:false,
-    strictAlien: true,
     access:'admin',
   },
   receiverCompte: {
     type: String,
-    required: true,
     access:'admin',
   },
   manager: {
     type: Schema.Types.ObjectId,
     impact:false,
     ref: ManagerModel.modelName,
-    strictAlien: true,
-    required: true,
     access:'admin',
   },
   senderFile: [{
     type: String,
-    required: true,
     file: {
       length: [0, 4],
       type: ['*/*'],
@@ -50,7 +43,6 @@ const TransactionSchema = SQuery.Schema({
   }],
   managerFile: [{
     type: String,
-    required: true,
     file: {
       length: [0, 4],
       type: ['*/*'],
@@ -63,23 +55,8 @@ const TransactionSchema = SQuery.Schema({
     type: String,
     access:'admin',
   },
-  serviceCharge: {
-    type: Number,
-    required: true,
-    access:'admin',
-  },
-  orgServiceCharge: {
-    type: Number,
-    required: true,
-    access:'admin',
-  },
-  ristourne: {
-    type: Number,
-    access:'admin',
-  },
   sendingDiff:{
     type:Number,
-    required:true,
     access:'admin',
   },
   confirmDiff:{
