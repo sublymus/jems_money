@@ -1,0 +1,83 @@
+.deep {
+    /* color: #ffffffb0; */
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    overflow-y: scroll;
+}
+
+.deep .ref-btn:hover {
+    background: rgb(39, 97, 107);
+}
+
+.deep .ref-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 10px 30px;
+    margin: 10px 0;
+    color: #ffffffa9;
+    font-size: 1.2em;
+    border-radius: 10px;
+    background: rgba(51, 102, 85, 0.572);
+    /* cursor: pointer; */
+}
+
+.deep .ref-btn h1:hover {
+    color: #fff;
+    /* cursor: pointer; */
+}
+.deep .ref-btn input {
+
+    color: #fff;
+    /* cursor: pointer; */
+}
+
+.deep .top-ctn {
+    width: 80%;
+    max-width: 700px;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(51, 85, 102, 0.351);
+}
+
+.deep .back:hover,
+.deep .rest:hover {
+    background: #ffffff;
+}
+
+.deep .back,
+.deep .rest {
+    background: #d9d9d9;
+    color: #356;
+    border-radius: 7px;
+    padding: 5px 15px;
+    margin-right: 30px;
+    cursor: pointer;
+}
+
+.deep .title {
+    color: #fff;
+    font-size: 1.3em;
+}
+.deep .top-ctn input {
+    color: #ffee00;
+    font-size: 1.3em;
+}
+
+.deep .container {
+    padding: 30px;
+    display: flex;
+    width: 500px;
+    align-items: center;
+    flex-direction: column;
+    overflow-y: scroll;
+    height: 80%;
+    max-height: 80vh;
+}
