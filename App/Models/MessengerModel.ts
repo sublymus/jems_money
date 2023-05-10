@@ -4,14 +4,16 @@ import { SQuery } from "../../lib/squery/SQuery";
 import DiscussionModel from "./DiscussionModel";
 
 let MessengerSchema = SQuery.Schema({
-  listDiscussion: [{
+  open: {
+    type: Schema.Types.ObjectId,
+    ref: DiscussionModel.modelName,
+  },
+  closed: [
+    {
       type: Schema.Types.ObjectId,
       ref: DiscussionModel.modelName,
-    }],
-  archives: [{
-      type: Schema.Types.ObjectId,
-      ref: DiscussionModel.modelName,
-    }],
+    },
+  ],
 });
 
 const MessengerModel = mongoose.model("messenger", MessengerSchema);
