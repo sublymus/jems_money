@@ -15,10 +15,6 @@ let AgenceSchema = SQuery.Schema({
         type:String,
         required:true,
     }],
-    country:[{
-        type:String,
-        required:true,
-    }],
 });
 
 const AgenceModel = mongoose.model("agence", AgenceSchema);

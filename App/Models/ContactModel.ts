@@ -4,10 +4,13 @@ import { SQuery } from "../../lib/squery/SQuery";
 import MessageModel from "./MessageModel";
 import AccountModel from "./AccountModel";
 import { ModelControllers } from "../../lib/squery/Initialize";
+import { compare } from "bcrypt";
+import CountryModel from "./CountryModel";
 
 let ContactSchema = SQuery.Schema({
     country: {
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref:CountryModel.modelName
     },
     telephone: {
         type: String,
@@ -21,7 +24,8 @@ let ContactSchema = SQuery.Schema({
     account: {
         type: Schema.Types.ObjectId,
         ref: AccountModel.modelName
-    }
+    },
+
 });
 
 const ContactModel = mongoose.model("contact", ContactSchema);

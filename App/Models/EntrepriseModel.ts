@@ -3,6 +3,7 @@ import { MakeModelCtlForm } from "../../lib/squery/ModelCtrlManager";
 import { SQuery } from "../../lib/squery/SQuery";
 import AccountModel from "./AccountModel";
 import ManagerModel from "./ManagerModel";
+import CountryModel from "./CountryModel";
 
 const EntrepriseSchema = SQuery.Schema({
   transactions: [{
@@ -12,7 +13,15 @@ const EntrepriseSchema = SQuery.Schema({
   manager:[{
     type:Schema.Types.ObjectId,
     ref:ManagerModel.modelName
-  }]
+  }],
+  serviceCharge:{
+    type:Number,
+  },
+  countries:[{
+    type:Schema.Types.ObjectId, 
+    ref:CountryModel.modelName
+  }],
+  
 });
 export const EntrepriseModel = mongoose.model("entreprise", EntrepriseSchema);
 

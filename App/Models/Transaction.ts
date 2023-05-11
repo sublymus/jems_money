@@ -9,20 +9,17 @@ import ContactModel from "./ContactModel";
 
 const TransactionSchema = SQuery.Schema({
   
-  sender: {
+  senderAccount: {
     type: Schema.Types.ObjectId,
     ref:AccountModel.modelName,
     impact:false,
     access:'admin',
   },
-  receiver: {
+  receiverContact: {
     type: Schema.Types.ObjectId,
     ref: ContactModel.modelName,
     impact:false,
-    access:'admin',
-  },
-  receiverCompte: {
-    type: String,
+    alien:true,
     access:'admin',
   },
   manager: {
@@ -55,20 +52,6 @@ const TransactionSchema = SQuery.Schema({
     type: String,
     access:'admin',
   },
-  sendingDiff:{
-    type:Number,
-    access:'admin',
-  },
-  confirmDiff:{
-    type:Number,
-    required:true,
-    access:'admin',
-  },
-  confirmDate:{
-    type:Number,
-    required:true,
-    access:'admin',
-  },
   discussion:{
     type:Schema.Types.ObjectId,
     ref:DiscussionModel.modelName,
@@ -88,6 +71,5 @@ const maker = MakeModelCtlForm({
   schema: TransactionSchema,
   volatile: false,
 });
-
 
 export default TransactionModel;

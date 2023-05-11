@@ -14,8 +14,9 @@ let AccountSchema = SQuery.Schema({
     password: {
         type: String,
         required: true,
+        minlength: 4,
+        maxlength: 4,
         access: "private",
-        get: (v: string) => 'password',
     },
     telephone: {
         type: String,
