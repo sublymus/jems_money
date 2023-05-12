@@ -16,7 +16,7 @@ export class Login extends BaseComponent {
                 _('option', ['value:entreprisemanager'], 'Entreprise Manager'),
             ),
             _('div', 'input-ctn',
-                _('input', ['type:text', 'class:email', 'placeholder:email']),
+                _('input', ['type:text', 'class:telephone', 'placeholder:telephone']),
                 _('input', ['type:text', 'class:password', 'placeholder:password'])
             ),
             _('div@submit', 'submit', 'SUBMIT'),

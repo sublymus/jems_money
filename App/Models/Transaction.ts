@@ -25,7 +25,7 @@ const TransactionSchema = SQuery.Schema({
   manager: {
     type: Schema.Types.ObjectId,
     impact:false,
-    ref: ManagerModel.modelName,
+    ref: 'manager',
     access:'admin',
   },
   senderFile: [{

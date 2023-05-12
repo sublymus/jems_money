@@ -4,10 +4,10 @@ import { SQuery } from "../../lib/squery/SQuery";
 import DiscussionModel from "./DiscussionModel";
 
 let MessengerSchema = SQuery.Schema({
-  open: {
+  opened: [{
     type: Schema.Types.ObjectId,
     ref: DiscussionModel.modelName,
-  },
+  }],
   closed: [
     {
       type: Schema.Types.ObjectId,

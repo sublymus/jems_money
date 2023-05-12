@@ -3,14 +3,7 @@ import { MakeModelCtlForm } from "../../lib/squery/ModelCtrlManager";
 import { SQuery } from "../../lib/squery/SQuery";
 
 const ManagerPreferenceSchema = SQuery.Schema({
-  nigthMode:{
-    type:Boolean,
-  },
-  currentDevise:{
-    type:String,
-    match:/^.+\/.+$/
-  }
-  
+
 });
 export const ManagerPreferenceModel = mongoose.model("managerpreference", ManagerPreferenceSchema);
 

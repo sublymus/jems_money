@@ -5,11 +5,14 @@ import DiscussionModel from "./DiscussionModel";
 import AgenceModel from "./AgenceModel";
 
 let CountrySchema = SQuery.Schema({
-    icon: [{
+    icon: {
         type: String,
-    }],
+    },
     name: {
         type:String
+    },
+    allowCarte:{
+        type:Boolean,
     },
     agencies:[{
         type:Schema.Types.ObjectId,

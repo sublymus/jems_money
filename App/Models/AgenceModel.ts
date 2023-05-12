@@ -6,15 +6,18 @@ let AgenceSchema = SQuery.Schema({
     name: {
         type: String
     },
-    icon: [{
+    icon: {
         type: String,
-        required: true,
-        file: {}
-    }],
-    typeTransaction:[{
+    },
+    number:{
         type:String,
-        required:true,
-    }],
+    },
+    managerName:{
+        type:String
+    },
+    charge:{
+        type:Number,
+    }
 });
 
 const AgenceModel = mongoose.model("agence", AgenceSchema);

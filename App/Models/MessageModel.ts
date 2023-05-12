@@ -27,8 +27,15 @@ const ctrlMaker = MakeModelCtlForm({
     model: MessageModel,
     volatile: true,
 });
+
 ctrlMaker.pre('create',async ({ctx})=>{
     if(ctx.__permission == 'admin') return;
     ctx.data.account = ctx.login.id;
+})
+
+ctrlMaker.pre('list',async ({ctx})=>{
+    if(ctx.data.paging?.query?.__parentModel.startsWith('discussion')) {
+        delete ctx.data.remove;
+    }
 })
 export default MessageModel;

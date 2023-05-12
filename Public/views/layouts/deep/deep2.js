@@ -182,9 +182,7 @@ export class Deep extends BaseComponent {
                         _('h1', 'label', 'Show Array'),
                         _('h3', 'id', data.modelPath + '.' + data.property),
                     );
-                    this.instance.when('refresh', async () => {
-                        //this.wait($(btn, 'h3'), 'textContent', (await this.instance[data.property]).$id)
-                    })
+                   
                     btn.addEventListener('click', async () => {
                         this.emit('hide');
                         // //console.log('------- list btn ------', data);

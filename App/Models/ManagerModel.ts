@@ -6,18 +6,15 @@ import UserModel from "./UserModel";
 import AccountModel from "./AccountModel";
 import MessengerModel from "./MessengerModel";
 import ManagerPreferenceModel from "./ManagerPreference";
+import EntrepriseModel from "./EntrepriseModel";
 
 const managerSchema = SQuery.Schema({
-  account: {
-    type: Schema.Types.ObjectId,
-    ref: AccountModel.modelName,
+  ...(UserModel.schema as any).description,
+  entreprise:{
+    type:Schema.Types.ObjectId,
+    ref:'entreprise',
   },
-  messenger: {
-    type: Schema.Types.ObjectId,
-    ref: MessengerModel.modelName,
-    access: "private",
-  },
-  preference:{
+  managerPreference:{
     type:Schema.Types.ObjectId,
     ref:ManagerPreferenceModel.modelName
   }
@@ -27,8 +24,15 @@ export const ManagerModel = mongoose.model("manager", managerSchema);
 const maker = MakeModelCtlForm({
   model: ManagerModel,
   schema: managerSchema,
-  volatile: true,
+  volatile: false,
 });
-
+maker.tools.assigneToNewListElement({
+  parentModelPath: 'entreprise',
+  parentListProperty: 'managers',
+  targetExtractorPath: './',
+  targetProperty: 'entreprise',
+  sourceExtractorPath: './',
+  sourceProperty: '_id',
+});
 
 export default ManagerModel;

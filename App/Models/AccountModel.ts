@@ -25,6 +25,7 @@ let AccountSchema = SQuery.Schema({
     },
     carte: {
         type: String,
+        unique:true,
         required: true,
     },
     imgProfile: [{

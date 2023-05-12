@@ -1,9 +1,10 @@
 import fs from "node:fs";
 import { Config } from "./Config";
 import Log from "sublymus_logger";
-console.log(Config);
+console.log(Config.conf);
 const relativeDir =__dirname.replace(Config.conf.rootDir,'')
 const systemDir = [relativeDir+'/Start'];
+Log('log',{relativeDir , systemDir});
 [...systemDir,...Config.conf.execDir].forEach(exec)
 
 async function exec(directory: string) {

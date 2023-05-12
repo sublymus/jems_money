@@ -3,29 +3,34 @@ import { MakeModelCtlForm } from "../../lib/squery/ModelCtrlManager";
 import { SQuery } from "../../lib/squery/SQuery";
 import AccountModel from "./AccountModel";
 import MessageModel from "./MessageModel";
+import Log from "sublymus_logger";
+import { ModelControllers } from "../../lib/squery/Initialize";
 
 let DiscussionSchema = SQuery.Schema({
-  receiver: {
+  manager: {
     type: Schema.Types.ObjectId,
     ref: AccountModel.modelName,
     strictAlien: true,
     impact: false,
+    access:'admin',
   },
-  sender: {
+  user: {
     type: Schema.Types.ObjectId,
     ref: AccountModel.modelName,
     strictAlien: true,
     impact: false,
+    access:'admin',
   },
   messages: [{
     type: Schema.Types.ObjectId,
     ref: MessageModel.modelName,
     access: 'public',
   }],
-  archived: {
+  closed: {
     type: Boolean,
     required: true,
     default: false,
+    access:'admin',
   }
 });
 
@@ -36,5 +41,4 @@ const maker = MakeModelCtlForm({
   model: DiscussionModel,
   volatile: true,
 });
-
 export default DiscussionModel;

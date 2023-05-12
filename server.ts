@@ -1,10 +1,9 @@
+import "./squeryconfig";
 import cors from "cors";
 import express from "express";
 import path from "path";
 import { SQuery } from "./lib/squery/SQuery";
-import { Server } from "socket.io";
 import Log from "sublymus_logger";
-
 
 
 

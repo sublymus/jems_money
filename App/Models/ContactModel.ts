@@ -19,7 +19,11 @@ let ContactSchema = SQuery.Schema({
         type: String
     },
     agence: {
-        type: String
+        type: Schema.Types.ObjectId,
+        ref:'agence'
+    },
+    typeTransaction:{
+        type:String
     },
     account: {
         type: Schema.Types.ObjectId,
@@ -40,6 +44,13 @@ ctrlMaker.pre('read', async ({ ctx }) => {
     if (ctx.data.telephone) {
         const account = await  ModelControllers['account'].option.model.findOne({
             telephone: ctx.data.telephone
+        });
+        if(account){
+            ctx.data.account = account._id.toString();
+        }
+    } else if (ctx.data.carte) {
+        const account = await  ModelControllers['account'].option.model.findOne({
+            carte: ctx.data.carte
         });
         if(account){
             ctx.data.account = account._id.toString();

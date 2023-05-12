@@ -1,22 +1,269 @@
 export const load = {
-  post: {
+  user: {
     create: {
-      message: {
-        // user: '',
-        text: "c' est mon post",
-        fileList: [],
-        // __fileList: {
-        //   type: String,
-        //   maxlength: 10,
-        //   minlength: 10,
-        // },
-        // targets: {
-        //   type: Schema.Types.ObjectId,
-        //   ref: 'user',/////
-        // }
+      account: {
+        name: 'blabla',
+        password: '3456',
+        telephone: '+79998627441',
+        carte: '3456876509871235',
+        imgProfile: []
       },
-    },
-    likeCount: 35,
+      contacts: [],
+      //currentTransaction:'',
+      transactions: [],
+      messenger: {
+        opened: [],
+        closed: [],
+      },
+      preference: {
+        nigthMode: true,
+        currentDevise: 'rub',
+        watcthDifference: 'rub/xof'
+      }
+    }
+  },
+  entreprise: {
+    create: {
+      transactions: [],
+      managers: [{
+        account: {
+          name: 'Manager001',
+          password: '0001',
+          telephone: '+79998627001',
+          carte: '3456876509871001',
+          imgProfile: []
+        },
+        contacts: [],
+        transactions: [],
+        messenger: {
+          opened: [],
+          closed: [],
+        },
+        preference: {
+          nigthMode: true,
+          currentDevise: 'rub',
+          watcthDifference: 'rub/xof'
+        },
+      },{
+        account: {
+          name: 'Manager002',
+          password: '0002',
+          telephone: '+79998627002',
+          carte: '3456876509871002',
+          imgProfile: []
+        },
+        contacts: [],
+        transactions: [],
+        messenger: {
+          opened: [],
+          closed: [],
+        },
+        preference: {
+          nigthMode: true,
+          currentDevise: 'rub',
+          watcthDifference: 'rub/xof'
+        },
+      }],
+      users:[{
+        account: {
+          name: 'User001',
+          password: '0001',
+          telephone: '+79798627001',
+          carte: '9856876509871001',
+          imgProfile: []
+        },
+        contacts: [{},{},{}],
+        transactions: [],
+        messenger: {
+          opened: [],
+          closed: [],
+        },
+        preference: {
+          nigthMode: true,
+          currentDevise: 'rub',
+          watcthDifference: 'rub/xof'
+        },
+      },{
+        account: {
+          name: 'User002',
+          password: '0002',
+          telephone: '+79798627002',
+          carte: '9856876509871002',
+          imgProfile: []
+        },
+        contacts: [{},{},{}],
+        transactions: [],
+        messenger: {
+          opened: [],
+          closed: [],
+        },
+        preference: {
+          nigthMode: true,
+          currentDevise: 'rub',
+          watcthDifference: 'rub/xof'
+        },
+      },{
+        account: {
+          name: 'User003',
+          password: '0003',
+          telephone: '+79798627003',
+          carte: '9856876509871003',
+          imgProfile: []
+        },
+        contacts: [{},{},{}],
+        transactions: [],
+        messenger: {
+          opened: [],
+          closed: [],
+        },
+        preference: {
+          nigthMode: true,
+          currentDevise: 'rub',
+          watcthDifference: 'rub/xof'
+        },
+      },{
+        account: {
+          name: 'User004',
+          password: '0004',
+          telephone: '+79798627004',
+          carte: '9856876509871004',
+          imgProfile: []
+        },
+        contacts: [{},{},{}],
+        transactions: [],
+        messenger: {
+          opened: [],
+          closed: [],
+        },
+        preference: {
+          nigthMode: true,
+          currentDevise: 'rub',
+          watcthDifference: 'rub/xof'
+        },
+      },{
+        account: {
+          name: 'User005',
+          password: '0005',
+          telephone: '+79798627005',
+          carte: '9856876509871005',
+          imgProfile: []
+        },
+        contacts: [{},{},{}],
+        transactions: [],
+        messenger: {
+          opened: [],
+          closed: [],
+        },
+        preference: {
+          nigthMode: true,
+          currentDevise: 'rub',
+          watcthDifference: 'rub/xof'
+        },
+      }],
+      serviceCharge: 0.01,
+      countries: [{
+        icon: 'https://cdn-icons-png.flaticon.com/512/197/197391.png',
+        name: "Côte d'ivoire",
+        allowCarte: true,
+        agencies: [{
+          name: "Orange Money",
+          number:'+2250749383335',
+          charge:0.01,
+          managerName:'Okon Okon Jean-Luc',
+          icon: 'https://1000logos.net/wp-content/uploads/2021/02/Orange-Money-emblem-500x228.png',
+        },{
+          name: "MTN Money",
+          number:'+2250584528696',
+          charge:0.01,
+          managerName:'Okon Okon Jean-Luc',
+          icon: 'https://www.sanwi-informatique.com/img/cms/mtn-money.png',
+        },{
+          name: "Wave",
+          number:'+2250749383335',
+          charge:0.01,
+          managerName:'Okon Okon Jean-Luc',
+          icon: 'https://play-lh.googleusercontent.com/NgAdQMq9Mu2NTJredx6COxScVB3tp153h_bVKQTXUt9Aou0Lz1PfffaQt5jFN9jlBfo',
+        }]
+      },{
+        icon: 'https://cdn-icons-png.flaticon.com/512/197/197429.png',
+        name: "Mali",
+        allowCarte: true,
+        agencies: [{
+          name: "Orange Money",
+          number:'+2250749383335',
+          charge:0.01,
+          managerName:'Okon Okon Jean-Luc',
+          icon: 'https://1000logos.net/wp-content/uploads/2021/02/Orange-Money-emblem-500x228.png',
+        }]
+      },{
+        icon: 'https://cdn-icons-png.flaticon.com/512/197/197377.png',
+        name: "Sénégal",
+        allowCarte: true,
+        agencies: [{
+          name: "Orange Money",
+          number:'+2250749383335',
+          charge:0.01,
+          managerName:'Okon Okon Jean-Luc',
+          icon: 'https://1000logos.net/wp-content/uploads/2021/02/Orange-Money-emblem-500x228.png',
+        }]
+      },{
+        icon: 'https://cdn-icons-png.flaticon.com/512/323/323312.png',
+        name: "Burkina",
+        allowCarte: true,
+        agencies: [{
+          name: "Orange Money",
+          number:'+2250749383335',
+          charge:0.01,
+          managerName:'Okon Okon Jean-Luc',
+          icon: 'https://1000logos.net/wp-content/uploads/2021/02/Orange-Money-emblem-500x228.png',
+        }]
+      }, {
+        icon: 'https://cdn-icons-png.flaticon.com/512/197/197443.png',
+        name: "Togo",
+        allowCarte: true,
+        agencies: [{
+          name: "MTN Money",
+          number:'+22966820170',
+          charge:0.01,
+          managerName:'Shabi Oluwajimi Afolabi Akanni Nelson Aurel YABI',
+          icon: 'https://www.sanwi-informatique.com/img/cms/mtn-money.png',
+        }]
+      },{
+        icon: 'https://cdn-icons-png.flaticon.com/512/323/323347.png',
+        name: "Beni",
+        allowCarte: true,
+        agencies: [{
+          name: "MTN Money",
+          number:'+22966820170',
+          charge:0.01,
+          managerName:'Shabi Oluwajimi Afolabi Akanni Nelson Aurel YABI',
+          icon: 'https://www.sanwi-informatique.com/img/cms/mtn-money.png',
+        }]
+      },{
+        icon: 'https://cdn-icons-png.flaticon.com/512/323/323337.png',
+        name: "Congo Brazza",
+        allowCarte: true,
+        agencies: [{
+          name: "Orange Money",
+          number:'+237656578220',
+          charge:0.01,
+          managerName: 'Kendjang Takam Alex Bryan',
+          icon: 'https://1000logos.net/wp-content/uploads/2021/02/Orange-Money-emblem-500x228.png',
+        }]
+      },{
+        icon: 'https://cdn-icons-png.flaticon.com/512/323/323337.png',
+        name: "Cameroun",
+        allowCarte: true,
+        agencies: [{
+          name: "Orange Money",
+          number:'+237656578220',
+          charge:0.01,
+          managerName: 'Kendjang Takam Alex Bryan',
+          icon: 'https://1000logos.net/wp-content/uploads/2021/02/Orange-Money-emblem-500x228.png',
+        }]
+      }],
+      openedDiscussion: []
+    }
   },
   list: {
     addId: [],
@@ -30,267 +277,27 @@ export const load = {
       query: {},
     },
   },
-  article: {
-    create: {
-      name: "Salade",
-      stock: 2,
-      description:
-        "Plante cultivée dont on fait la salade (surtout laitues; batavias; scaroles; chicorées). Repiquer des salades.",
-      views: [],
-      price: 5,
-      folders: [
-        {
-          folderName: "wena0",
-        },
-        {
-          folderName: "wena1",
-        },
-        {
-          folderName: "wena2",
-        },
-      ],
-    },
-    read: { id: "" },
-    delete: { id: "" },
-    update: {
-      id: "",
-      name: "IPHONE 14",
-      stock: 12,
-      description: "le plus simple des laler",
-      price: 23000,
-    },
+  contact: {
+    create:{
+      country: 'CI',
+      telephone: '+255678998778',
+      carte:'53677589689089',
+    }
   },
-  user: {
-    create: {
-      messenger: {
-        discussions: [],
-      },
-      account: {
-        name: "baron",
-        email: "sublymus@gmail.com",
-        password: "azert",
-        telephone: "12345678",
-        status: "property",
-        address: {
-          location: "l:567455;h45678654",
-          room: 45,
-          door: 296,
-          etage: 4,
-          description: "je suis ici",
-          city: "Rostov on don",
-        },
-        favorites: {
-          folders: [
-            {
-              folderName: "wena0",
-            },
-            {
-              folderName: "wena1",
-            },
-            {
-              folderName: "wena2",
-            },
-            {
-              folderName: "wena3",
-            },
-            {
-              folderName: "wena4",
-            },
-            {
-              folderName: "wena5",
-            },
-          ],
-        },
-        profile: {
-          //imgProfile: 'http://www.ert.fr/fgiurr85o28t5.img',
-          //banner: 'http://www.ert.fr/fgiurr85o28t5.img',
-          message: "*** BEST ****",
-        },
-        //createdDate: Date.now() - 1_000_000_000 + parseInt(Math.random() * 1_000_000_000),
-      },
+  country:{
+    create:{
+      icon: {
+        type: String,
     },
-    read: {
-      id: "",
+    name: {
+        type:String
     },
-    delete: {
-      id: "",
+    allowCarte:{
+        type:Boolean,
     },
-  },
-
-  entreprise: {
-    create: {
-      managers: [""],
-      buildings: [""],
-      address: {
-        location: "l:567455;h45678654",
-        building: {
-          name: "Sublymus E45",
-          city: "Rostov-On-Don",
-        },
-        room: 45,
-        door: 296,
-        etage: 4,
-        description: "je suis ici",
-      },
-      telephone: [1234567890, 8765432, 65456787654],
-      email: "etp@gmail.com",
-      webPageUrl:
-        "https://v2.voiranime.com/anime/tengoku-daimakyou/tengoku-daimakyou-01-vostfr/",
-      profile: {
-        //imgProfile: 'http://www.ert.fr/fgiurr85o28t5.img',
-        //banner: 'http://www.ert.fr/fgiurr85o28t5.img',
-        message: "*** BEST ****",
-      },
-      creationDate: Date.now(),
-    },
-  },
-  quarter: {
-    create: {
-      name: "skypark Center",
-      city: "Rostov on don",
-      Thread: {
-        name: "quarter_Thread",
-        description: "thread_main",
-        vectors: [],
-        users: [],
-      },
-      activities: [
-        {
-          poster: {
-            message: "*** BEST ****",
-          },
-          channel: {
-            name: "Sport_Channel",
-            firstWatcher: "",
-            description: "more description about sport channel",
-            vectors: [],
-            users: [],
-          },
-          name: "Sport",
-          description: "we love sport",
-        },
-      ],
-      buildings: [],
-    },
-    read: { id: "" },
-  },
-  building: {
-    create: {
-      name: "skypark Center",
-      city: "Rostov on don",
-      Thread: {
-        name: "Building_Thread",
-        description: "thread_main",
-        vectors: [],
-        users: [],
-      },
-    },
-  },
-  account: {
-    read: { id: "" },
-    update: {
-      id: "",
-      name: "baron",
-      email: "sublymus@gmail.com",
-      password: "azert",
-      telephone: "12345678",
-      address: {
-        location: "l:567455;h45678654",
-        home: "ville",
-        description: "je suis ici",
-      },
-      favorites: {
-        folders: [
-          {
-            folderName: "wena",
-          },
-        ],
-      },
-      profile: {
-        imgProfile: "http://www.ert.fr/fgiurr85o28t5.img",
-        banner: "http://www.ert.fr/fgiurr85o28t5.img",
-        message: "*** BEST ****",
-      },
-    },
-  },
-  profile: {
-    read: { id: "" },
-    update: {
-      id: "",
-      imgProfile: "http://www.ert.fr/fgiurr85o28t5.img",
-      banner: "http://www.ert.fr/fgiurr85o28t5.img",
-      message: "*** BEST ****",
-    },
-  },
-  address: {
-    read: { id: "" },
-    update: {
-      id: "",
-      location: "l:567455;h45678654",
-      home: "ville",
-      description: "je suis ici",
-    },
-  },
-  favorites: {
-    read: { id: "" },
-    update: {
-      id: "",
-      folders: [
-        {
-          folderName: "wena",
-        },
-      ],
-    },
-  },
-  folder: {
-    create: { folderName: "" },
-    read: { id: "" },
-    update: {
-      id: "",
-      folderName: "",
-    },
-    delete: { id: "" },
-  },
-  post: {
-    create: {
-      message: {
-        text: "Hello Its my",
-        file: [],
-      },
-      likeCount: 2098,
-    },
-    read: { id: "" },
-    update: {
-      id: "",
-      folderName: "",
-    },
-    delete: { id: "" },
-  },
-  login: {
-    email: "sublymus@gmail.com",
-    password: "azert",
-  },
-  server: {
-    validId: {
-      id: " I'm a valid ID \\(^-^)/ ",
-      modelPath: "user",
-    },
-  },
-  ["server-model"]: {
-    create: {
-      modelPath: "account",
-    },
-  },
-};
-load.manager = {
-  create: {
-    ...load["user"].create,
-    entreprise: "",
-  },
-};
-load.entreprisemanager = {
-  create: {
-    ...load["user"].create,
-    entreprise: "",
-  },
+    agencies:[{
+        
+    }]
+    }
+  }
 };

@@ -8,6 +8,9 @@ const UserPreferenceSchema = SQuery.Schema({
   },
   currentDevise:{
     type:String,
+  },
+  watcthDifference:{
+    type:String,
     match:/^.+\/.+$/
   }
   

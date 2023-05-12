@@ -16,20 +16,15 @@ let userSchema = SQuery.Schema({
   contacts:[{
     type:Schema.Types.ObjectId,
     ref:ContactModel.modelName,
+    alien:true,
     access:'private',
   }],
-  currentTransaction: {
-    type: Schema.Types.ObjectId,
-    ref: TransactionModel.modelName,
-  },
-  currentDiscussion: {
-    type: Schema.Types.ObjectId,
-    ref: DiscussionModel.modelName,
-  },
   transactions: [
     {
       type: Schema.Types.ObjectId,
       ref: TransactionModel.modelName,
+      impact:false,
+      access:'admin',
     },
   ],
   messenger: {
@@ -48,7 +43,7 @@ const UserModel = mongoose.model("user", userSchema);
 const maker = MakeModelCtlForm({
   model: UserModel,
   schema: userSchema,
-  volatile: true,
+  volatile: false,
 });
 
 export default UserModel;

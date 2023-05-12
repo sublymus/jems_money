@@ -108,6 +108,7 @@ const main : MainType=  function (
       }
       let res: ResultSchema = null;
       let modelRequest = !!(ModelControllers[ctrlName]?.()[service]) && modelServiceEnabled.includes(service);
+      Log("ERROR_Controller", {modelRequest});
       try {
         if (modelRequest) {
           res = await ModelControllers[ctrlName]?.()[service]?.(ctx);
