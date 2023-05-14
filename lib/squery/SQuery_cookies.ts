@@ -1,4 +1,4 @@
-import { SQuery } from "./SQuery";
+
 import { parse, serialize } from "cookie";
 import jwt from "jsonwebtoken";
 import { Config } from "./Config";
