@@ -1,5 +1,7 @@
 import Log from "sublymus_logger";
+import { accessValidator } from "./AccessManager";
 import { ContextSchema } from "./Context";
+import { FileValidator } from "./FileManager";
 import {
   CtrlModelMakerSchema,
   DescriptionSchema,
@@ -7,125 +9,130 @@ import {
   EventPreSchema,
   ListenerPostSchema,
   ListenerPreSchema,
-  ModelServiceAvailable,
-  ModelControllers,
   ModelControllerSchema,
+  ModelControllers,
   ModelFrom_optionSchema,
   ModelInstanceSchema,
+  ModelServiceAvailable,
   MoreSchema,
   PopulateSchema,
   ResponseSchema,
-  TypeRuleSchema,
-  ToolsInterface,
   Tools,
+  ToolsInterface,
+  TypeRuleSchema,
 } from "./Initialize";
-import { accessValidator } from "./AccessManager";
-import { FileValidator } from "./FileManager";
-import { deleteFactory } from "./Model_delete";
 import { createFactory } from "./Model_Create";
-import { readFactory } from "./Model_read";
+import { deleteFactory } from "./Model_delete";
 import { listFactory } from "./Model_list";
+import { readFactory } from "./Model_read";
 import { updateFactory } from "./Model_update";
 const MakeModelCtlForm: (
   options: ModelFrom_optionSchema
 ) => CtrlModelMakerSchema = (
   options: ModelFrom_optionSchema
 ): CtrlModelMakerSchema => {
-    const option: ModelFrom_optionSchema & { modelPath: string } = {
-      ...options,
-      modelPath: options.model.modelName,
+  const option: ModelFrom_optionSchema & { modelPath: string } = {
+    ...options,
+    modelPath: options.model.modelName,
+  };
+  option.schema.model = option.model;
+  const EventManager: {
+    [p: string]: {
+      pre: ListenerPreSchema[];
+      post: ListenerPostSchema[];
     };
-    option.schema.model = option.model;
-    const EventManager: {
-      [p: string]: {
-        pre: ListenerPreSchema[];
-        post: ListenerPostSchema[];
-      };
-    } = {};
+  } = {};
 
-    const callPre: (e: EventPreSchema) => Promise<void> = async (
-      e: EventPreSchema
-    ) => {
-      if (!EventManager[e.ctx.service]?.pre) return;
+  const callPre: (e: EventPreSchema) => Promise<void> = async (
+    e: EventPreSchema
+  ) => {
+    if (!EventManager[e.ctx.service]?.pre) return;
 
-      for (const listener of EventManager[e.ctx.service].pre) {
-        try {
-          if (listener) await listener(e);
-        } catch (error) {
-          Log("ERROR_callPre", error);
-        }
-      }
-    };
-    const callPost: (e: EventPostSchema) => ResponseSchema = async (
-      e: EventPostSchema
-    ) => {
+    for (const listener of EventManager[e.ctx.service].pre) {
       try {
-        if (!EventManager[e.ctx.service]?.post) return e.res;
-        for (const listener of EventManager[e.ctx.service].post) {
-
-          if (listener) await listener(e);
-
-        }
-        return e.res;
+        if (listener) await listener(e);
       } catch (error) {
-        Log("ERROR_callPost", error);
-      }
-    };
-    const ctrlMaker = function () {
-      const controller: ModelControllerSchema = {};
-
-      controller[option.volatile ? "create" : "store"] = createFactory(controller, option, callPost, callPre);
-
-      controller["read"] = readFactory(controller, option, callPost, callPre);
-
-      controller["list"] = listFactory(controller, option, callPost, callPre);
-
-      controller["update"] = updateFactory(controller, option, callPost, callPre);
-
-      controller[option.volatile ? "delete" : "destroy"] = deleteFactory(controller, option, callPost, callPre);
-      return controller;
-    };
-
-    ctrlMaker.option = option;
-
-    ctrlMaker.pre = (
-      service: ModelServiceAvailable,
-      listener: ListenerPreSchema
-    ) => {
-      if (!EventManager[service]) {
-        EventManager[service] = {
-          pre: [],
-          post: [],
-        };
-      }
-      EventManager[service].pre.push(listener);
-      return ctrlMaker;
-    };
-    ctrlMaker.post = (
-      service: ModelServiceAvailable,
-      listener: ListenerPostSchema
-    ) => {
-
-      if (!EventManager[service]) {
-        EventManager[service] = {
-          pre: [],
-          post: [],
-        };
-      }
-      EventManager[service].post.push(listener);
-      return ctrlMaker;
-    };
-    ctrlMaker.tools = {} as (ToolsInterface & { maker: CtrlModelMakerSchema });
-    ctrlMaker.tools.maker = ctrlMaker;
-
-    for (const tool in Tools) {
-      if (Object.prototype.hasOwnProperty.call(Tools, tool)) {
-        const func = Tools[tool];
-        ctrlMaker.tools[tool] = func.bind(ctrlMaker.tools);
+        Log("ERROR_callPre", error);
       }
     }
-    return (ModelControllers[option.modelPath] = ctrlMaker);
   };
+  const callPost: (e: EventPostSchema) => ResponseSchema = async (
+    e: EventPostSchema
+  ) => {
+    try {
+      if (!EventManager[e.ctx.service]?.post) return e.res;
+      for (const listener of EventManager[e.ctx.service].post) {
+        if (listener) await listener(e);
+      }
+      return e.res;
+    } catch (error) {
+      Log("ERROR_callPost", error);
+    }
+  };
+  const ctrlMaker = function () {
+    const controller: ModelControllerSchema = {};
+
+    controller[option.volatile ? "create" : "store"] = createFactory(
+      controller,
+      option,
+      callPost,
+      callPre
+    );
+    Log("CREATED", createFactory(controller, option, callPost, callPre));
+    controller["read"] = readFactory(controller, option, callPost, callPre);
+
+    controller["list"] = listFactory(controller, option, callPost, callPre);
+
+    controller["update"] = updateFactory(controller, option, callPost, callPre);
+
+    controller[option.volatile ? "delete" : "destroy"] = deleteFactory(
+      controller,
+      option,
+      callPost,
+      callPre
+    );
+    return controller;
+  };
+
+  ctrlMaker.option = option;
+
+  ctrlMaker.pre = (
+    service: ModelServiceAvailable,
+    listener: ListenerPreSchema
+  ) => {
+    if (!EventManager[service]) {
+      EventManager[service] = {
+        pre: [],
+        post: [],
+      };
+    }
+    EventManager[service].pre.push(listener);
+    return ctrlMaker;
+  };
+  ctrlMaker.post = (
+    service: ModelServiceAvailable,
+    listener: ListenerPostSchema
+  ) => {
+    if (!EventManager[service]) {
+      EventManager[service] = {
+        pre: [],
+        post: [],
+      };
+    }
+    EventManager[service].post.push(listener);
+    return ctrlMaker;
+  };
+  ctrlMaker.tools = {} as ToolsInterface & { maker: CtrlModelMakerSchema };
+  ctrlMaker.tools.maker = ctrlMaker;
+
+  for (const tool in Tools) {
+    if (Object.prototype.hasOwnProperty.call(Tools, tool)) {
+      const func = Tools[tool];
+      ctrlMaker.tools[tool] = func.bind(ctrlMaker.tools);
+    }
+  }
+  return (ModelControllers[option.modelPath] = ctrlMaker);
+};
 
 async function formatModelInstance(
   ctx: ContextSchema,
@@ -173,37 +180,43 @@ function deepPopulate(
         }
       };
       if (!Array.isArray(rule)) {
-        if (!accessValidator({
-          ctx,
-          access:rule.access,
-          type: "property",
-          isOwner,
-          property:p
-          }) ) {
+        if (
+          !accessValidator({
+            ctx,
+            access: rule.access,
+            type: "property",
+            isOwner,
+            property: p,
+          })
+        ) {
           info.select = info.select + " -" + p;
           continue;
         }
         if (rule.ref) exec(rule);
       } else if (Array.isArray(rule) && rule[0].ref) {
-        if (!accessValidator({
-          ctx,
-          access:rule[0].access,
-          type: "property",
-          isOwner,
-          property:p
-          })) {
+        if (
+          !accessValidator({
+            ctx,
+            access: rule[0].access,
+            type: "property",
+            isOwner,
+            property: p,
+          })
+        ) {
           info.select = info.select + " -" + p;
           continue;
         }
         exec(rule[0]);
       } else if (Array.isArray(rule)) {
-        if (!accessValidator({
-          ctx,
-          access:rule[0].access,
-          type: "property",
-          isOwner,
-          property:p
-          })) {
+        if (
+          !accessValidator({
+            ctx,
+            access: rule[0].access,
+            type: "property",
+            isOwner,
+            property: p,
+          })
+        ) {
           info.select = info.select + " -" + p;
           continue;
         }
@@ -254,4 +267,3 @@ export {
   formatModelInstance,
   parentInfo,
 };
-
