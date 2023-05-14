@@ -163,7 +163,7 @@ export const listFactory = (controller: ModelControllerSchema, option: ModelFrom
         const promises = addNew.map((data) => {
           return new Promise(async (rev, rej) => {
             if (!more.__parentModel) rej(null);
-            const res = await ctrl.create(
+            const res = await (ctrl.create || ctrl.store)(
               {
                 ...ctx,
                 data,
@@ -189,12 +189,12 @@ export const listFactory = (controller: ModelControllerSchema, option: ModelFrom
       /***********************  remove : in DB - > in List ****************** */
       try {
         //Log("try", { remove, parentProperty });
-        Log('remove', { remove })
+        //Log('remove', { remove })
         if (Array.isArray(remove)) {
           for (const id of remove) {
             const impact = parentPropertyRule.impact != false;
             let res: ResultSchema;
-            Log("impact", { impact, parentProperty, parentPropertyRule });
+            //Log("impact", { impact, parentProperty, parentPropertyRule });
             if (impact) {
               res = await ModelControllers[option.modelPath]().delete(
                 {
@@ -203,7 +203,7 @@ export const listFactory = (controller: ModelControllerSchema, option: ModelFrom
                 },
                 more
               );
-              Log("List_remove_res", res);
+             // Log("List_remove_res", res);
               if (res.error) continue;
             }
             let include = false;
@@ -272,7 +272,7 @@ export const listFactory = (controller: ModelControllerSchema, option: ModelFrom
         }
       }
     } else {
-     // Log("je_ne_peux_pas_modifier", { addId, addNew, remove, isParentUser });
+      Log("je_ne_peux_pas_modifier", { addId, addNew, remove, isParentUser });
     }
     //Log('parent', parentModelInstance);
     //Log('parentModelInstance', { parentModelInstance })

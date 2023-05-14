@@ -21,6 +21,7 @@ import { SQuery_cookies } from "./SQuery_cookies";
 import { SQuery_files } from "./SQuery_files";
 import { SQuery_io } from "./SQuery_io";
 import { SQuery_Schema } from "./SQuery_schema";
+import { SQuery_service } from "./SQuery_service";
 
 type MapUserCtxSchema = {
   [p: string]: {
@@ -33,7 +34,7 @@ type MainType = ( socket: Socket )=>( (ctrlName: string, service: string) =>  (d
 type GlobalSchema = {
   io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>;
 };
-type SQuerySchema = (( socket: Socket )=> (ctrlName: string, service: string) => any) & {
+type SQuerySchema = (( socket: Socket )=> (ctrlName: string, service: string) => ( (data: DataSchema, cb?: CallBack) =>Promise<void>)) & {
   emiter: EventEmiter;
   io: ( server?: any ) => Server;
   Schema: (description: DescriptionSchema) => any;
@@ -41,6 +42,7 @@ type SQuerySchema = (( socket: Socket )=> (ctrlName: string, service: string) =>
   files: {
     accessValidator: (url: string, cookies: any) => Promise<UrlDataType>
   },
+  service:(ctrlName:string, service:string, data:DataSchema, ctx:ContextSchema)=>Promise<any>,
   cookies(
     socket: Socket,
     key?: string,
@@ -149,5 +151,6 @@ SQuery.files = SQuery_files;
 SQuery.cookies = SQuery_cookies;
 SQuery.io = SQuery_io;
 SQuery.Schema = SQuery_Schema;
+SQuery.service = SQuery_service;
 
 export { SQuery };

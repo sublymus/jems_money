@@ -39,6 +39,6 @@ const DiscussionModel = mongoose.model("discussion", DiscussionSchema);
 const maker = MakeModelCtlForm({
   schema: DiscussionSchema,
   model: DiscussionModel,
-  volatile: true,
+  volatile: false,
 });
 export default DiscussionModel;

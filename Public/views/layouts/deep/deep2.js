@@ -167,6 +167,7 @@ export class Deep extends BaseComponent {
                         // input.value = await this.instance[data.property]
                     });
                     $(btn, 'h1').addEventListener('click', async () => {
+                        if(!this.instance.$cache[data.property])return
                         this.emit('hide');
                         this.container.append(_('Deep', {
                             ...data,
@@ -196,7 +197,7 @@ export class Deep extends BaseComponent {
                     cb(btn);
                 });
                 this.when('createInput', ({ data, cb }) => {
-                    const input = _('input', ['type:text', `${data.value ?'value:'+ data.value:''}`, 'placeholder:' + data.property])
+                    const input = _('input', ['type:text', `${data.value!= undefined ?'value:'+ data.value:''}`, 'placeholder:' + data.property])
                     input.addEventListener('blur', async () => {
                         ////*console.log(this.instance[data.property]);
                         this.instance[data.property] = input.value;
@@ -207,7 +208,7 @@ export class Deep extends BaseComponent {
                         let i = 0;
                         const v = await this.instance[data.property];
                         input.value = '';
-                        this.waitAnim(input, 'value', v||'')
+                        this.waitAnim(input, 'value', v??'')
 
                     })
                     const inputCtn = _('div', 'input-ctn', _('h3', 'property', data.property), input)

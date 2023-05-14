@@ -30,6 +30,7 @@ const TransactionSchema = SQuery.Schema({
   },
   senderFile: [{
     type: String,
+    required:true,
     file: {
       length: [0, 4],
       type: ['*/*'],
@@ -38,6 +39,10 @@ const TransactionSchema = SQuery.Schema({
     },
     access:'admin',
   }],
+  sum:{
+    type: Number,
+    access:'admin',
+  },
   managerFile: [{
     type: String,
     file: {
@@ -52,6 +57,7 @@ const TransactionSchema = SQuery.Schema({
     type: String,
     access:'admin',
   },
+
   discussion:{
     type:Schema.Types.ObjectId,
     ref:DiscussionModel.modelName,

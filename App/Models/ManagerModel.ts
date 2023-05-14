@@ -3,10 +3,8 @@ import { SQueryMongooseSchema } from "../../lib/squery/Initialize";
 import { MakeModelCtlForm } from "../../lib/squery/ModelCtrlManager";
 import { SQuery } from "../../lib/squery/SQuery";
 import UserModel from "./UserModel";
-import AccountModel from "./AccountModel";
-import MessengerModel from "./MessengerModel";
 import ManagerPreferenceModel from "./ManagerPreference";
-import EntrepriseModel from "./EntrepriseModel";
+import DiscussionModel from "./DiscussionModel";
 
 const managerSchema = SQuery.Schema({
   ...(UserModel.schema as any).description,
@@ -14,6 +12,20 @@ const managerSchema = SQuery.Schema({
     type:Schema.Types.ObjectId,
     ref:'entreprise',
   },
+  currentDiscussions:[{
+    type:Schema.Types.ObjectId,
+    ref:DiscussionModel.modelName,
+    strictAlien:true,
+    impact:false,
+    access:'admin'
+  }],
+  lastDiscussions:[{
+    type:Schema.Types.ObjectId,
+    ref:DiscussionModel.modelName,
+    strictAlien:true,
+    impact:false,
+    access:'admin'
+  }],
   managerPreference:{
     type:Schema.Types.ObjectId,
     ref:ManagerPreferenceModel.modelName

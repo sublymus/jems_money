@@ -69,7 +69,7 @@ export const SQuery_io = (server: any) => {
             const signupCtrl = ModelControllers[authData.signup]();
             ModelControllers[authData.signup].pre(signupCtrl.create ? 'create' : 'store', setAuthValues(authData));
             if (readylist.includes(authData.login)) continue;
-            Log("init_Model_" + authData.login, authData);
+            //Log("init_Model_" + authData.login, authData);
             const loginCtrl = ModelControllers[authData.login]();
             ModelControllers[authData.login].pre(loginCtrl.create ? "create" : 'store', setPermission);
             ModelControllers[authData.login].post(loginCtrl.create ? "create" : 'store', setLoginCookie(authData));

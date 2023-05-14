@@ -1,10 +1,8 @@
 import mongoose, { Schema } from "mongoose";
 import { MakeModelCtlForm } from "../../lib/squery/ModelCtrlManager";
 import { SQuery } from "../../lib/squery/SQuery";
-import MessageModel from "./MessageModel";
 import AccountModel from "./AccountModel";
 import { ModelControllers } from "../../lib/squery/Initialize";
-import { compare } from "bcrypt";
 import CountryModel from "./CountryModel";
 
 let ContactSchema = SQuery.Schema({
@@ -14,7 +12,7 @@ let ContactSchema = SQuery.Schema({
     },
     telephone: {
         type: String,
-    },
+    }, 
     carte: {
         type: String
     },

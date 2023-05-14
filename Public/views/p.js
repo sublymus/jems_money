@@ -1,4 +1,8 @@
 export const load = {
+  login: {
+    telephone: "+79798627001",
+    password: "0001",
+  },
   user: {
     create: {
       account: {

@@ -5,10 +5,7 @@ import path from "path";
 import { SQuery } from "./lib/squery/SQuery";
 import Log from "sublymus_logger";
 
-
-
 const PORT =  3000;
-
 
 const app = express();
 const server = app.listen(PORT, () => {
@@ -18,6 +15,9 @@ const server = app.listen(PORT, () => {
 app.use(cors());
 
 
+app.get("/test", (req, res) => {
+  res.redirect("/test.html");
+});
 app.get("/", (req, res) => {
   res.redirect("/test.html");
 });
