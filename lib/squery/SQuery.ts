@@ -1,4 +1,7 @@
-
+import { Server, Socket } from "socket.io";
+import { DefaultEventsMap } from "socket.io/dist/typed-events";
+import Log from "sublymus_logger";
+import { ContextSchema, DataSchema, authDataOptionSchema } from "./Context";
 import {
   Controllers,
   DescriptionSchema,
@@ -7,20 +10,12 @@ import {
   ResultSchema,
   UrlDataType,
 } from "./Initialize";
-import { Server, Socket } from "socket.io";
-import { DefaultEventsMap } from "socket.io/dist/typed-events";
-import Log from "sublymus_logger";
-import {
-  ContextSchema,
-  DataSchema,
-  authDataOptionSchema,
-} from "./Context";
-import EventEmiter from "./event/eventEmiter";
 import { SQuery_auth } from "./SQuery_auth";
 import { SQuery_cookies } from "./SQuery_cookies";
 import { SQuery_files } from "./SQuery_files";
 import { SQuery_io } from "./SQuery_io";
 import { SQuery_Schema } from "./SQuery_schema";
+import EventEmiter from "./event/eventEmiter";
 
 type MapUserCtxSchema = {
   [p: string]: {
@@ -29,26 +24,35 @@ type MapUserCtxSchema = {
     isAvalaibleCtx: boolean;
   };
 };
-type MainType = ( socket: Socket )=>( (ctrlName: string, service: string) =>  (data: DataSchema, cb?: CallBack) => Promise<void>);
+type MainType = (
+  socket: Socket
+) => (
+  ctrlName: string,
+  service: string
+) => (data: DataSchema, cb?: CallBack) => Promise<void>;
 type GlobalSchema = {
   io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>;
 };
-type SQuerySchema = (( socket: Socket )=> (ctrlName: string, service: string) => any) & {
+type SQuerySchema = ((
+  socket: Socket
+) => (ctrlName: string, service: string) => any) & {
   emiter: EventEmiter;
-  io: ( server?: any ) => Server;
+  io: (server?: any) => Server;
   Schema: (description: DescriptionSchema) => any;
   auth: (authData: authDataOptionSchema) => void;
   files: {
-    accessValidator: (url: string, cookies: any) => Promise<UrlDataType>
-  },
-  cookies(
-    socket: Socket,
-    key?: string,
-    value?: any
-  ): Promise<any>;
+    accessValidator: (url: string, cookies: any) => Promise<UrlDataType>;
+  };
+  cookies(socket: Socket, key?: string, value?: any): Promise<any>;
 };
 export const MapUserCtx: MapUserCtxSchema = {};
-export const modelServiceEnabled = ["create", "read", "list", "update", "delete"];
+export const modelServiceEnabled = [
+  "create",
+  "read",
+  "list",
+  "update",
+  "delete",
+];
 export type CallBack = (result: ResultSchema | void) => any;
 export const Global: GlobalSchema = {
   io: null,
@@ -85,9 +89,7 @@ export async function defineContext(
   return ctx;
 }
 
-const main : MainType=  function (
-  socket: Socket
-) {
+const main: MainType = function (socket: Socket) {
   return (ctrlName: string, service: string) => {
     return async (data: DataSchema, cb?: CallBack) => {
       Log("squery:data", data, { ctrlName }, { service });
@@ -107,8 +109,10 @@ const main : MainType=  function (
         if (res !== undefined) return cb?.(res);
       }
       let res: ResultSchema = null;
-      let modelRequest = !!(ModelControllers[ctrlName]?.()[service]) && modelServiceEnabled.includes(service);
-      Log("ERROR_Controller", {modelRequest});
+      let modelRequest =
+        !!ModelControllers[ctrlName]?.()[service] &&
+        modelServiceEnabled.includes(service);
+      Log("ERROR_Controller", { modelRequest, service });
       try {
         if (modelRequest) {
           res = await ModelControllers[ctrlName]?.()[service]?.(ctx);

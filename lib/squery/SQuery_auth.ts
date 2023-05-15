@@ -1,8 +1,8 @@
+import mongoose from "mongoose";
 import Log from "sublymus_logger";
 import { AuthManager } from "./AuthManager";
 import { DataSchema, authDataOptionSchema, authDataSchema } from "./Context";
-import { CallBack, Global, SQuery, defineContext } from "./SQuery";
-import mongoose from "mongoose";
+import { CallBack, SQuery, defineContext } from "./SQuery";
 
 export const AuthDataMap: { [p: string]: authDataSchema } = {};
 /*
@@ -27,18 +27,21 @@ export const SQuery_auth = (authDataOption: authDataOptionSchema) => {
   };
   authData.match.push("__permission");
   AuthDataMap[authData.signup] = authData;
-
+  Log(`DE_MERDA`, `login:${authData.login}`);
   SQuery.io().on("connection", (socket: any) => {
-    socket.on(`login:${authData.signup}`, async (data: DataSchema, cb: CallBack) => {
-      Log(`login:${authData.signup}`, data);
-      data.__permission = authData.__permission;
-      const authCtrl = new AuthManager();
-      const res = await authCtrl.login({
-        ...(await defineContext(socket, "login", "read", data)),
-        authData,
-      });
-      cb(res);
-    });
+    socket.on(
+      `login:${authData.login}`,
+      async (data: DataSchema, cb: CallBack) => {
+        data.__permission = authData.__permission;
+        const authCtrl = new AuthManager();
+        const res = await authCtrl.login({
+          ...(await defineContext(socket, "login", "read", data)),
+          authData,
+        });
+        Log(`loginTesT:${authData.login}`, res);
+        cb(res);
+      }
+    );
     socket.on(
       `signup:${authData.signup}`,
       async (data: DataSchema, cb: CallBack) => {
