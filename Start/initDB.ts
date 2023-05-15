@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 mongoose.set("strictQuery", false);
 (async () => {
   try {
-    const db = await mongoose.connect('mongodb://127.0.0.1:27017/jems_money');
+    const db = await mongoose.connect('mongodb://127.0.0.1:27017/jems');
     console.log('mongoose connect Models Count = '+db.modelNames.length);
     
     //initialData(db);

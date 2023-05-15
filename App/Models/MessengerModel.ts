@@ -7,11 +7,14 @@ let MessengerSchema = SQuery.Schema({
   opened: [{
     type: Schema.Types.ObjectId,
     ref: DiscussionModel.modelName,
+    impact:false,
   }],
   closed: [
     {
       type: Schema.Types.ObjectId,
       ref: DiscussionModel.modelName,
+      strictAlien:true,
+      impact:false,
     },
   ],
 });

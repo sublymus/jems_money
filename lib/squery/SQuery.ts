@@ -15,6 +15,7 @@ import { SQuery_cookies } from "./SQuery_cookies";
 import { SQuery_files } from "./SQuery_files";
 import { SQuery_io } from "./SQuery_io";
 import { SQuery_Schema } from "./SQuery_schema";
+import { SQuery_service } from "./SQuery_service";
 import EventEmiter from "./event/eventEmiter";
 
 type MapUserCtxSchema = {
@@ -35,7 +36,10 @@ type GlobalSchema = {
 };
 type SQuerySchema = ((
   socket: Socket
-) => (ctrlName: string, service: string) => any) & {
+) => (
+  ctrlName: string,
+  service: string
+) => (data: DataSchema, cb?: CallBack) => Promise<void>) & {
   emiter: EventEmiter;
   io: (server?: any) => Server;
   Schema: (description: DescriptionSchema) => any;
@@ -43,6 +47,12 @@ type SQuerySchema = ((
   files: {
     accessValidator: (url: string, cookies: any) => Promise<UrlDataType>;
   };
+  service: (
+    ctrlName: string,
+    service: string,
+    data: DataSchema,
+    ctx: ContextSchema
+  ) => Promise<any>;
   cookies(socket: Socket, key?: string, value?: any): Promise<any>;
 };
 export const MapUserCtx: MapUserCtxSchema = {};
@@ -112,7 +122,7 @@ const main: MainType = function (socket: Socket) {
       let modelRequest =
         !!ModelControllers[ctrlName]?.()[service] &&
         modelServiceEnabled.includes(service);
-      Log("ERROR_Controller", { modelRequest, service });
+      Log("ERROR_Controller", { modelRequest });
       try {
         if (modelRequest) {
           res = await ModelControllers[ctrlName]?.()[service]?.(ctx);
@@ -153,5 +163,6 @@ SQuery.files = SQuery_files;
 SQuery.cookies = SQuery_cookies;
 SQuery.io = SQuery_io;
 SQuery.Schema = SQuery_Schema;
+SQuery.service = SQuery_service;
 
 export { SQuery };

@@ -13,5 +13,4 @@ const maker = MakeModelCtlForm({
   volatile: false,
 });
 
-
 export default ManagerPreferenceModel;

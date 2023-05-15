@@ -14,7 +14,7 @@ export class Home extends BaseComponent {
     constructor() {
         super();
         SQuery.dataStore = {
-            useStore: true,
+            useStore: false,
             updateTimeOut: 500,
             setData: async (key, data) => {
                 try {

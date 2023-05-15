@@ -1,12 +1,11 @@
-import "./squeryconfig";
-
 import cors from "cors";
 import express from "express";
 import path from "path";
 import Log from "sublymus_logger";
 import { SQuery } from "./lib/squery/SQuery";
+import "./squeryconfig";
 
-const PORT = 3001;
+const PORT = 3000;
 
 const app = express();
 const server = app.listen(PORT, () => {
@@ -15,6 +14,9 @@ const server = app.listen(PORT, () => {
 
 app.use(cors());
 
+app.get("/test", (req, res) => {
+  res.redirect("/test.html");
+});
 app.get("/", (req, res) => {
   res.redirect("/test.html");
 });

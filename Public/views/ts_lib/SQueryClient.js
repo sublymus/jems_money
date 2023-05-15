@@ -12,6 +12,7 @@ const socket = io(null, {
 
 
 socket.on("storeCookie", (cookie, cb) => {
+  console.log(cookie);
   document.cookie = cookie;
   console.log("document.cookie :  ", document.cookie);
   cb(document.cookie);
