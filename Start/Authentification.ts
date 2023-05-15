@@ -7,9 +7,9 @@ SQuery.auth({
   signup: "user",
 });
 
-// SQuery.auth({
-//   login: "account",
-//   // extension: [EmailConfirmartion],
-//   match: ["telephone", "password"],
-//   signup: "manager",
-// });
+SQuery.auth({
+  login: "account",
+  // extension: [EmailConfirmartion],
+  match: ["telephone", "password"],
+  signup: "manager",
+});

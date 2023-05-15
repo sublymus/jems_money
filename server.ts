@@ -1,9 +1,10 @@
+import "./squeryconfig";
+
 import cors from "cors";
 import express from "express";
 import path from "path";
 import Log from "sublymus_logger";
 import { SQuery } from "./lib/squery/SQuery";
-import "./squeryconfig";
 
 const PORT = 3000;
 

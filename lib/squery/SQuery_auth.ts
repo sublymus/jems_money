@@ -27,10 +27,9 @@ export const SQuery_auth = (authDataOption: authDataOptionSchema) => {
   };
   authData.match.push("__permission");
   AuthDataMap[authData.signup] = authData;
-  Log(`DE_MERDA`, `login:${authData.login}`);
   SQuery.io().on("connection", (socket: any) => {
     socket.on(
-      `login:${authData.login}`,
+      `login:${authData.signup}`,
       async (data: DataSchema, cb: CallBack) => {
         data.__permission = authData.__permission;
         const authCtrl = new AuthManager();
@@ -38,7 +37,6 @@ export const SQuery_auth = (authDataOption: authDataOptionSchema) => {
           ...(await defineContext(socket, "login", "read", data)),
           authData,
         });
-        Log(`loginTesT:${authData.login}`, res);
         cb(res);
       }
     );

@@ -1,32 +1,38 @@
-
 import Log from "sublymus_logger";
-import STATUS from "./Errors/STATUS";
 import { ContextSchema, authDataSchema } from "./Context";
+import STATUS from "./Errors/STATUS";
 import { ModelControllers, ResponseSchema } from "./Initialize";
 import { SQuery } from "./SQuery";
 
 export class AuthManager {
-
   login = async (ctx: ContextSchema): ResponseSchema => {
-    
     const { data, socket, authData: authDataAny } = ctx;
     const authData: authDataSchema = authDataAny;
     let loginModelInstance = null;
-    Log('login',ctx.data);
+    Log("login", ctx.data);
     //console.log('login',ctx.data);
-    
+
     try {
       let filter: any = {};
       authData.match.forEach((property) => {
-        if (!data[property]) throw new Error('ILLEGAL_ARGUMEMNT property <' + property + '> = ' + data[property] + ';');
+        if (!data[property])
+          throw new Error(
+            "ILLEGAL_ARGUMEMNT property <" +
+              property +
+              "> = " +
+              data[property] +
+              ";"
+          );
 
         filter[property] = data[property];
       });
-      loginModelInstance = await ModelControllers[authData.login].option.model.findOne(filter);
-      Log('loginModelInstance', loginModelInstance)
+      loginModelInstance = await ModelControllers[
+        authData.login
+      ].option.model.findOne(filter);
+      Log("loginModelInstance", loginModelInstance);
     } catch (error) {
-      Log('ERROR_loginModelInstance', error);
-    //  console.log('ERROR_loginModelInstance', error);
+      Log("ERROR_loginModelInstance", error);
+      //  console.log('ERROR_loginModelInstance', error);
       return {
         error: `${authData.login.toLocaleUpperCase()} BAD_AUTH`,
         ...(await STATUS.BAD_AUTH(ctx, {
@@ -55,7 +61,17 @@ export class AuthManager {
       __signupId: loginModelInstance.__signupId.toString(),
     };
 
-    await SQuery.cookies(socket, 'token', token);
+    Log("AVANT_LE_cookies", {
+      modelPath: token.__loginModelPath,
+      id: token.__loginId,
+    });
+    await SQuery.cookies(socket, "token", token);
+
+    Log("APLE_cookies", {
+      modelPath: token.__loginModelPath,
+      id: token.__loginId,
+    });
+
     return {
       response: {
         login: {
@@ -64,8 +80,8 @@ export class AuthManager {
         },
         signup: {
           modelPath: token.__signupModelPath,
-          id: token.__signupId
-        }
+          id: token.__signupId,
+        },
       },
       ...(await STATUS.OPERATION_SUCCESS(ctx, {
         target: authData.login.toLocaleUpperCase(),
@@ -89,26 +105,25 @@ export class AuthManager {
       }
     } catch (error) {
       return {
-        error: 'OPERATION FAILED',
+        error: "OPERATION FAILED",
         ...(await STATUS.OPERATION_FAILED(ctx, {
           target: authData.signup.toLocaleUpperCase(),
-          message: error
+          message: error,
         })),
       };
     }
     const more: any = {};
     const res = await ModelControllers[authData.signup]()["create"](ctx, more);
-    Log("ici", res)
+    Log("ici", res);
     if (res.error) {
       return {
         error: "OPERATION_FAILED",
         ...(await STATUS.OPERATION_FAILED(ctx, {
           target: authData.signup.toLocaleUpperCase(),
-          message: res.error
+          message: res.error,
         })),
       };
     }
-    return res
+    return res;
   };
-
 }
