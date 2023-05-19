@@ -64,7 +64,7 @@ const Messenger: ControllerSchema = {
                 service: 'list',
                 __key:etp.__key,
                 data: {
-                    addId: [discussionId],
+                    addId: [...discussionId],
                     paging: {
                         query: {
                             __parentModel: `entreprise_${etp._id.toString()}_openedDiscussion_discussion`

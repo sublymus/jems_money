@@ -9,7 +9,7 @@ export const SQuery_files = {
       let urlData: UrlDataType;
       try {
         if (!url) throw new Error('url is missing;');
-        url = url.substring(url.lastIndexOf('/') + 1, url.length)
+        url =  url.substring(url.lastIndexOf('/') + 1).replace(url.substring(url.lastIndexOf('.')),'')
         urlData = jwt.verify(url, Config.conf.URL_KEY) as any;
         if (!urlData) throw new Error('invalid url , urlData  is missing');
         const rule = ModelControllers[urlData.modelPath]?.option.schema.description[urlData.property];

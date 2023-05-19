@@ -4,7 +4,6 @@ import { ContextSchema } from "./Context";
 import EventEmiter from './event/eventEmiter';
 export type StatusSchema = {
   code: string,
-  __key ?: string,
   message: string,
   status: number,
 }
@@ -82,9 +81,9 @@ export type UrlDataType = {
 }
 
 
-export type ListenerPreSchema = (e: EventPreSchema) => Promise<void>;
+export type ListenerPreSchema = (e: EventPreSchema) => Promise<void | ResultSchema>;
 
-export type ListenerPostSchema = (e: EventPostSchema) => Promise<void>;
+export type ListenerPostSchema = (e: EventPostSchema) => Promise<void | ResultSchema>;
 
 export type ModelControllerConfigSchema = {
   option?: ModelFrom_optionSchema;
@@ -104,7 +103,6 @@ export type SaveCtrlOptionSchema = {
   ctrl: {
     [p: string]: ControllerSchema
   },
-  name?: string,
   access?: {
     [p: string]: 'any' | 'user' | 'admin'
   },
@@ -176,6 +174,16 @@ export type ModelInstanceSchema = {
       toString: () => string;
     };
   };
+  _id?: {
+    toString: () => string;
+  };
+  __parentModel:string,
+  __permission?:string,
+  __signupId?:string,
+  __createdAt:number,
+  __updatedAt:number,
+  __updatedProperty:string[],
+
   select: (p: string) => Promise<void>;
 };
 export interface ModelToolsInterface{
@@ -215,7 +223,6 @@ export type TypeRuleSchema = {
   alien?: boolean,
   strictAlien?: boolean,
   access?: ModelAccessAvailable;//
-  populate?: boolean;// 
   file?: {//
     size?: number | [number, number];
     length?: number | [number, number];
@@ -225,8 +232,12 @@ export type TypeRuleSchema = {
   ref?: string;
   default?: valueSchema;
   share?:Share_ADD|Share_EXC|Share_ONY,
+  //rule?:any,
   //bind?:any,
+  deep?:Number,
 
+  
+  populate?: boolean;// 
   expires?:number,
   index?:boolean,
   sparse?:boolean,

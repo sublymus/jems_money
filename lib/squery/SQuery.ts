@@ -8,6 +8,7 @@ import {
   GlobalMiddlewares,
   ModelControllers,
   ResultSchema,
+  SQueryMongooseSchema,
   UrlDataType,
 } from "./Initialize";
 import { SQuery_auth } from "./SQuery_auth";
@@ -17,6 +18,7 @@ import { SQuery_io } from "./SQuery_io";
 import { SQuery_Schema } from "./SQuery_schema";
 import { SQuery_service } from "./SQuery_service";
 import EventEmiter from "./event/eventEmiter";
+import { FlatRecord, ResolveSchemaOptions, SchemaOptions } from "mongoose";
 
 type MapUserCtxSchema = {
   [p: string]: {
@@ -42,7 +44,7 @@ type SQuerySchema = ((
 ) => (data: DataSchema, cb?: CallBack) => Promise<void>) & {
   emiter: EventEmiter;
   io: (server?: any) => Server;
-  Schema: (description: DescriptionSchema) => any;
+  Schema: (description: DescriptionSchema , options?:SchemaOptions<FlatRecord<any>, {}, {}, {}, {}> | ResolveSchemaOptions<{}>) => SQueryMongooseSchema;
   auth: (authData: authDataOptionSchema) => void;
   files: {
     accessValidator: (url: string, cookies: any) => Promise<UrlDataType>;
@@ -102,6 +104,7 @@ export async function defineContext(
 const main: MainType = function (socket: Socket) {
   return (ctrlName: string, service: string) => {
     return async (data: DataSchema, cb?: CallBack) => {
+      data = data || {};
       Log("squery:data", data, { ctrlName }, { service });
 
       const ctx: ContextSchema = await defineContext(

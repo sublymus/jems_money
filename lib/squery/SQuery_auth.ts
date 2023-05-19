@@ -31,13 +31,14 @@ export const SQuery_auth = (authDataOption: authDataOptionSchema) => {
     socket.on(
       `login:${authData.signup}`,
       async (data: DataSchema, cb: CallBack) => {
+        data = data || {};
         data.__permission = authData.__permission;
         const authCtrl = new AuthManager();
         const res = await authCtrl.login({
           ...(await defineContext(socket, "login", "read", data)),
           authData,
         });
-        cb(res);
+        cb?.(res);
       }
     );
     socket.on(

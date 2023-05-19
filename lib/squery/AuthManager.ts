@@ -1,7 +1,7 @@
 import Log from "sublymus_logger";
 import { ContextSchema, authDataSchema } from "./Context";
 import STATUS from "./Errors/STATUS";
-import { ModelControllers, ResponseSchema } from "./Initialize";
+import { ControlSchema, ControllerSchema, ModelControllerSchema, ModelControllers, ResponseSchema } from "./Initialize";
 import { SQuery } from "./SQuery";
 
 export class AuthManager {
@@ -113,7 +113,8 @@ export class AuthManager {
       };
     }
     const more: any = {};
-    const res = await ModelControllers[authData.signup]()["create"](ctx, more);
+    const ctrl =  ModelControllers[authData.signup]();
+    const res =  await (ctrl.create || ctrl.store)(ctx, more);
     Log("ici", res);
     if (res.error) {
       return {

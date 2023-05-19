@@ -6,7 +6,7 @@ import { Controllers, DescriptionSchema, EventPostSchema, EventPreSchema, ModelC
 import { backDestroy, formatModelInstance } from "./ModelCtrlManager";
 import { SQuery } from "./SQuery";
 
-export const listFactory = (controller: ModelControllerSchema, option: ModelFrom_optionSchema & { modelPath: string }, callPost: (e: EventPostSchema) => ResponseSchema, callPre: (e: EventPreSchema) => Promise<void>) => {
+export const listFactory = (controller: ModelControllerSchema, option: ModelFrom_optionSchema & { modelPath: string }, callPost: (e: EventPostSchema) => ResponseSchema, callPre: (e: EventPreSchema) => Promise<void | ResultSchema>) => {
   return async (ctx: ContextSchema, more: MoreSchema): ResponseSchema => {
     const service = "list";
     ctx = { ...ctx };
@@ -14,9 +14,9 @@ export const listFactory = (controller: ModelControllerSchema, option: ModelFrom
     ctx.ctrlName = option.modelPath;
     if (!accessValidator({
       ctx,
-      access:option.access,
+      rule: option,
       type: "controller"
-      })) {
+    })) {
       return await callPost({
         ctx,
         more,
@@ -38,12 +38,13 @@ export const listFactory = (controller: ModelControllerSchema, option: ModelFrom
       signupId: ctx.signup?.id,
     };
 
-    await callPre({
+    const preRes = await callPre({
       ctx,
       more,
     });
-   
-   
+    if (preRes) return preRes
+
+
     paging = paging || {};
     //   Log('remove', { remove })
     const parts = more.__parentModel?.split("_");
@@ -106,11 +107,14 @@ export const listFactory = (controller: ModelControllerSchema, option: ModelFrom
     if (
       parentPropertyRule &&
       accessValidator({
-        ctx,
-        access:parentPropertyRule.access,
+        ctx:{
+          ...ctx,
+          service:'update',
+        },
+        rule: parentPropertyRule,
         type: "property",
-        isOwner:isParentUser,
-        })
+        isOwner: isParentUser,
+      })
     ) {
 
       /***********************  AddId  ****************** */
@@ -159,7 +163,7 @@ export const listFactory = (controller: ModelControllerSchema, option: ModelFrom
       if (Array.isArray(addNew) && parentPropertyRule.strictAlien != true) {
         Log("Je_peux_cree_dans_la_list", true);
         const ctrl = ModelControllers[option.modelPath]();
-        more.__parentModel = parentModelPath+'_'+ parentId+'_'+parentProperty+'_'+option.modelPath;
+        more.__parentModel = parentModelPath + '_' + parentId + '_' + parentProperty + '_' + option.modelPath;
         const promises = addNew.map((data) => {
           return new Promise(async (rev, rej) => {
             if (!more.__parentModel) rej(null);
@@ -170,6 +174,7 @@ export const listFactory = (controller: ModelControllerSchema, option: ModelFrom
               },
               { ...more },
             );
+            Log('________',res)
             if (res.error) rej(null);
             else rev(res.response);
           });
@@ -203,7 +208,7 @@ export const listFactory = (controller: ModelControllerSchema, option: ModelFrom
                 },
                 more
               );
-             // Log("List_remove_res", res);
+              // Log("List_remove_res", res);
               if (res.error) continue;
             }
             let include = false;
@@ -239,7 +244,7 @@ export const listFactory = (controller: ModelControllerSchema, option: ModelFrom
         validAddId.length > 0
       const canSave = hasNewId ||
         (Array.isArray(remove) && remove.length > 0);
-
+        Log('added',{added ,validAddNew , addId, addNew,  validAddId, canSave , hasNewId})
       if (canSave) {
         try {
           if (hasNewId) {
@@ -250,7 +255,8 @@ export const listFactory = (controller: ModelControllerSchema, option: ModelFrom
           }
           await parentModelInstance.save();
           added = [...validAddNew, ...validAddId];
-          if (parentPropertyRule.emit!= false) {
+          Log('added',{added})
+          if (parentPropertyRule.emit != false) {
             SQuery.io().emit('list/' + parentModelPath + '/' + parentProperty + ':' + parentId, {
               added,
               removed
@@ -283,11 +289,14 @@ export const listFactory = (controller: ModelControllerSchema, option: ModelFrom
     } : { __key: ctx.__key };
     if (
       parentProperty && !accessValidator({
-        ctx,
-        access:parentPropertyRule.access,
+        ctx:{
+          ...ctx,
+          service:'list',
+        },
+        rule: parentPropertyRule,
         type: "property",
-        isOwner:isParentUser
-        })
+        isOwner: isParentUser
+      })
     )
       return await callPost({
         ctx,
@@ -334,10 +343,10 @@ export const listFactory = (controller: ModelControllerSchema, option: ModelFrom
         query,
         options
       );
+      Log('werty', {pagingData , ...query, options})
       pagingData.added = added;
       pagingData.removed = removed;
-      if (!pagingData) {
-      }
+      
       const promise = pagingData.items.map((item: any) => {
         return formatModelInstance(ctx, service, option, item);
       });

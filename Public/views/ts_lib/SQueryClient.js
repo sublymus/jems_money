@@ -81,23 +81,25 @@ const SQuery = {
       throw new Error("DISCONNECT FROM SERVER");
     }
   },
-  emit: (event, ...arg) => {
+  emit: (event, data , listener) => {
     if (typeof event != "string")
       throw new Error(
         "cannot emit with following event : " +
         event +
         "; event value must be string"
       );
-    socket.emit(event, ...arg);
+    socket.emit(event, data , listener);
   },
-  on: (event, ...arg) => {
+  on: (event, listerner) => {
     if (typeof event != "string")
       throw new Error(
         "cannot emit with following event : " +
         event +
         "; event value must be string"
       );
-    socket.on(event, ...arg);
+    socket.on(event, (...data)=>{
+      listerner(...data);
+    });
   },
   getDescription: async function (modelPath) {
     if (typeof modelPath != 'string') throw new Error('getDescription(' + modelPath + ') is not permit, parameter must be string');

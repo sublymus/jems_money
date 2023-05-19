@@ -1,10 +1,11 @@
-import { Schema } from "mongoose";
+import { FlatRecord, ResolveSchemaOptions, Schema, SchemaOptions } from "mongoose";
 import { DescriptionSchema, SQueryMongooseSchema } from "./Initialize";
 import { Global, SQuery } from "./SQuery";
 import mongoosePaginate from "mongoose-paginate-v2";
 import mongoose_unique_validator from "mongoose-unique-validator";
+import Log from "sublymus_logger";
 
-export const SQuery_Schema = (description: DescriptionSchema): SQueryMongooseSchema => {
+export const SQuery_Schema = (description: DescriptionSchema , options?:SchemaOptions<FlatRecord<any>, {}, {}, {}, {}> | ResolveSchemaOptions<{}>): SQueryMongooseSchema => {
     description.__parentModel = {
       type: String,
       access: "admin",
@@ -41,7 +42,9 @@ export const SQuery_Schema = (description: DescriptionSchema): SQueryMongooseSch
       type: Schema.Types.ObjectId,
       access: 'public'
     };
-    const schema = new Schema(description as any);
+    const schema = new Schema(description as any,{
+
+    });
     schema.plugin(mongoosePaginate);
     schema.plugin(mongoose_unique_validator);
   
@@ -51,7 +54,7 @@ export const SQuery_Schema = (description: DescriptionSchema): SQueryMongooseSch
     });
   
     schema.post("save", async function (doc: any) {
-      //Log('save+++++++', doc.__parentModel,);
+      Log('save+++++++', doc);
       // SQuery.emiter.when('update:' + doc._id.toString(), (val) => {
       //   Log('update:' + doc._id.toString(), val);
       // })

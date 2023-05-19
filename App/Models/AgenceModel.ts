@@ -25,7 +25,7 @@ const AgenceModel = mongoose.model("agence", AgenceSchema);
 const ctrlMaker = MakeModelCtlForm({
     schema: AgenceSchema,
     model: AgenceModel,
-    volatile: true,
+    volatile: false,
 });
 
 export default AgenceModel;

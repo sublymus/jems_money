@@ -42,7 +42,7 @@ export const SQuery_cookies = async (socket, key: string, value?: any) => {
           "; " +
           cookieToken;
       } catch (error) {
-        console.log({ error });
+        Log('ERROR_COOKIES',{ error });
         rev(null);
       }
       rev(clientCookie);

@@ -5,21 +5,26 @@ export function accessValidator(option: {
   ctx: ContextSchema,
   isOwner?: boolean,
   type: "controller" | "property",
-  access:
-  | "public"
-  | "share"
-  | "admin"
-  | "secret"
-  | "private"
-  | "default"
-  | undefined,
-  share?: {
-    permissions: string[],
-  },
+  rule: {
+    access?:
+    | "public"
+    | "share"
+    | "admin"
+    | "secret"
+    | "private"
+    | "default"
+    | undefined,
+    share?: {
+      add?: string[],
+      ony?: string[],
+      exc?: string[],
+    },
+  }
   property?: string,
 }) {
-  let { ctx, access, type, isOwner, property, share } = option;
-  let {service, signup } = ctx;
+  let { ctx, type, isOwner, property , rule } = option;
+  let {access , share } = rule;
+  let { service, signup } = ctx;
   const accessMap = {
     controller: {
       create: {
@@ -91,12 +96,20 @@ export function accessValidator(option: {
   let clientPermission = ctx.__permission?.startsWith("client:") ? "client" : (ctx.__permission || 'any');
 
   if (clientPermission == "client") {
-    if (isOwner) {
-      clientPermission = 'owner';
-    } else if (share) {
-      if (share.permissions.includes(ctx.__permission)) {
-        clientPermission = 'shared';
+    if (share) {
+      if (Array.isArray(share.ony) && share.ony.includes(ctx.__permission)) {
+        clientPermission = isOwner?'owner':'shared';
       }
+      if (Array.isArray(share.add) && [ctx.__permission, ...share.add].includes(ctx.__permission)) {
+        clientPermission = isOwner?'owner':'shared';
+      }
+      if (Array.isArray(share.exc) && !share.exc.includes(ctx.__permission)) {
+        clientPermission = isOwner?'owner':'shared';
+      }
+    }else{
+      if (isOwner) {
+        clientPermission = 'owner';
+      } 
     }
   }
   let valid = accessMap[type]?.[service]?.[access].includes(clientPermission);
@@ -108,7 +121,7 @@ export function accessValidator(option: {
   //     property,
   //     share
   //   },
-  //   { 
+  //   {
   //     __permision: ctx.__permission,
   //     clientPermission,
   //     service,

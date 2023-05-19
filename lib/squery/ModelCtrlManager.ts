@@ -17,6 +17,7 @@ import {
   MoreSchema,
   PopulateSchema,
   ResponseSchema,
+  ResultSchema,
   Tools,
   ToolsInterface,
   TypeRuleSchema,
@@ -31,108 +32,107 @@ const MakeModelCtlForm: (
 ) => CtrlModelMakerSchema = (
   options: ModelFrom_optionSchema
 ): CtrlModelMakerSchema => {
-  const option: ModelFrom_optionSchema & { modelPath: string } = {
-    ...options,
-    modelPath: options.model.modelName,
-  };
-  option.schema.model = option.model;
-  const EventManager: {
-    [p: string]: {
-      pre: ListenerPreSchema[];
-      post: ListenerPostSchema[];
+    const option: ModelFrom_optionSchema & { modelPath: string } = {
+      ...options,
+      modelPath: options.model.modelName,
     };
-  } = {};
+    option.schema.model = option.model;
+    const EventManager: {
+      [p: string]: {
+        pre: ListenerPreSchema[];
+        post: ListenerPostSchema[];
+      };
+    } = {};
 
-  const callPre: (e: EventPreSchema) => Promise<void> = async (
-    e: EventPreSchema
-  ) => {
-    if (!EventManager[e.ctx.service]?.pre) return;
+    const callPre: (e: EventPreSchema) => Promise<void | ResultSchema> = async (
+      e: EventPreSchema
+    ) => {
+      if (!EventManager[e.ctx.service]?.pre) return;
 
-    for (const listener of EventManager[e.ctx.service].pre) {
+      for (const listener of EventManager[e.ctx.service].pre) {
+        try {
+          if (listener) return await listener(e);
+        } catch (error) {
+          Log("ERROR_callPre", error);
+        }
+      }
+    };
+    const callPost: (e: EventPostSchema) => ResponseSchema = async (
+      e: EventPostSchema
+    ) => {
       try {
-        if (listener) await listener(e);
+        if (!EventManager[e.ctx.service]?.post) return e.res;
+        for (const listener of EventManager[e.ctx.service].post) {
+          if (listener) await listener(e);
+        }
+        return e.res;
       } catch (error) {
-        Log("ERROR_callPre", error);
+        Log("ERROR_callPost", error);
+      }
+    };
+    const ctrlMaker = function () {
+      const controller: ModelControllerSchema = {};
+
+      controller[option.volatile ? "create" : "store"] = createFactory(
+        controller,
+        option,
+        callPost,
+        callPre
+      );
+      controller["read"] = readFactory(controller, option, callPost, callPre);
+
+      controller["list"] = listFactory(controller, option, callPost, callPre);
+
+      controller["update"] = updateFactory(controller, option, callPost, callPre);
+
+      controller[option.volatile ? "delete" : "destroy"] = deleteFactory(
+        controller,
+        option,
+        callPost,
+        callPre
+      );
+      return controller;
+    };
+
+    ctrlMaker.option = option;
+
+    ctrlMaker.pre = (
+      service: ModelServiceAvailable,
+      listener: ListenerPreSchema
+    ) => {
+      if (!EventManager[service]) {
+        EventManager[service] = {
+          pre: [],
+          post: [],
+        };
+      }
+      EventManager[service].pre.push(listener);
+      return ctrlMaker;
+    };
+    ctrlMaker.post = (
+      service: ModelServiceAvailable,
+      listener: ListenerPostSchema
+    ) => {
+      if (!EventManager[service]) {
+        EventManager[service] = {
+          pre: [],
+          post: [],
+        };
+      }
+      EventManager[service].post.push(listener);
+      return ctrlMaker;
+    };
+    ctrlMaker.tools = {} as ToolsInterface & { maker: CtrlModelMakerSchema };
+    ctrlMaker.tools.maker = ctrlMaker;
+
+    for (const tool in Tools) {
+      if (Object.prototype.hasOwnProperty.call(Tools, tool)) {
+        const func = Tools[tool];
+        ctrlMaker.tools[tool] = func.bind(ctrlMaker.tools);
       }
     }
+    return (ModelControllers[option.modelPath] = ctrlMaker);
   };
-  const callPost: (e: EventPostSchema) => ResponseSchema = async (
-    e: EventPostSchema
-  ) => {
-    try {
-      if (!EventManager[e.ctx.service]?.post) return e.res;
-      for (const listener of EventManager[e.ctx.service].post) {
-        if (listener) await listener(e);
-      }
-      return e.res;
-    } catch (error) {
-      Log("ERROR_callPost", error);
-    }
-  };
-  const ctrlMaker = function () {
-    const controller: ModelControllerSchema = {};
-
-    controller[option.volatile ? "create" : "store"] = createFactory(
-      controller,
-      option,
-      callPost,
-      callPre
-    );
-    Log("CREATED", createFactory(controller, option, callPost, callPre));
-    controller["read"] = readFactory(controller, option, callPost, callPre);
-
-    controller["list"] = listFactory(controller, option, callPost, callPre);
-
-    controller["update"] = updateFactory(controller, option, callPost, callPre);
-
-    controller[option.volatile ? "delete" : "destroy"] = deleteFactory(
-      controller,
-      option,
-      callPost,
-      callPre
-    );
-    return controller;
-  };
-
-  ctrlMaker.option = option;
-
-  ctrlMaker.pre = (
-    service: ModelServiceAvailable,
-    listener: ListenerPreSchema
-  ) => {
-    if (!EventManager[service]) {
-      EventManager[service] = {
-        pre: [],
-        post: [],
-      };
-    }
-    EventManager[service].pre.push(listener);
-    return ctrlMaker;
-  };
-  ctrlMaker.post = (
-    service: ModelServiceAvailable,
-    listener: ListenerPostSchema
-  ) => {
-    if (!EventManager[service]) {
-      EventManager[service] = {
-        pre: [],
-        post: [],
-      };
-    }
-    EventManager[service].post.push(listener);
-    return ctrlMaker;
-  };
-  ctrlMaker.tools = {} as ToolsInterface & { maker: CtrlModelMakerSchema };
-  ctrlMaker.tools.maker = ctrlMaker;
-
-  for (const tool in Tools) {
-    if (Object.prototype.hasOwnProperty.call(Tools, tool)) {
-      const func = Tools[tool];
-      ctrlMaker.tools[tool] = func.bind(ctrlMaker.tools);
-    }
-  }
-  return (ModelControllers[option.modelPath] = ctrlMaker);
-};
 
 async function formatModelInstance(
   ctx: ContextSchema,
@@ -160,7 +160,11 @@ function deepPopulate(
   service: ModelServiceAvailable,
   ref: string,
   info: PopulateSchema,
-  isOwner?: boolean
+  isOwner: boolean,
+  count?:{
+    count:number,
+    max:number
+  },
 ) {
   const description: DescriptionSchema =
     ModelControllers[ref].option.schema.description;
@@ -171,19 +175,27 @@ function deepPopulate(
       const rule = description[p];
 
       const exec = (rule: TypeRuleSchema) => {
-        if (rule.populate == true) {
+        if (rule.deep && !count ) {
+          count = {
+            count:0,
+            max:rule.deep as number
+          }
+        }
+        if(count && (count.count < count.max)){
+          count.count++;
           const info2 = {
             path: p,
           };
           info.populate.push(info2);
-          deepPopulate(ctx, service, rule.ref, info2, isOwner);
+          deepPopulate(ctx, service, rule.ref, info2,isOwner , count );
         }
+        
       };
       if (!Array.isArray(rule)) {
         if (
           !accessValidator({
             ctx,
-            access: rule.access,
+            rule,
             type: "property",
             isOwner,
             property: p,
@@ -197,7 +209,7 @@ function deepPopulate(
         if (
           !accessValidator({
             ctx,
-            access: rule[0].access,
+            rule: rule[0],
             type: "property",
             isOwner,
             property: p,
@@ -211,7 +223,7 @@ function deepPopulate(
         if (
           !accessValidator({
             ctx,
-            access: rule[0].access,
+            rule: rule[0],
             type: "property",
             isOwner,
             property: p,
@@ -260,10 +272,24 @@ function parentInfo(parentModel: string): {
   };
 }
 
+// function InstanceRule(instance:ModelInstanceSchema){
+//   const parts = instance.__parentModel.split('_');
+//   const parentModelPath = parts?.[0];
+//   const parentId = parts?.[1];
+//   const parentProperty = parts?.[2];
+//   const instanceModelPatth = parts?.[2];
+//   const description: DescriptionSchema = ModelControllers[instanceModelPatth].option.schema.description;
+//   const propertyRule = description[in]
+// }
+// function collectRule(){
+  
+// }
+
 export {
   MakeModelCtlForm,
   backDestroy,
   FileValidator,
+ // InstanceRule,
   formatModelInstance,
   parentInfo,
 };

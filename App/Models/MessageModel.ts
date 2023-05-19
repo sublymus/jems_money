@@ -25,7 +25,7 @@ const MessageModel = mongoose.model("message", MessageSchema);
 const ctrlMaker = MakeModelCtlForm({
     schema: MessageSchema,
     model: MessageModel,
-    volatile: true,
+    volatile: false,
 });
 
 ctrlMaker.pre('create',async ({ctx})=>{

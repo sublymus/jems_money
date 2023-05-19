@@ -1,5 +1,6 @@
 import Log from "sublymus_logger";
 import { ContextSchema } from "./Context";
+import  mime from "mime-types"; 
 import { FileSchema, ModelServiceAvailable, TypeRuleSchema, UrlDataType } from "./Initialize";
 import fs from "node:fs";
 import { Config } from "./Config";
@@ -15,7 +16,7 @@ function isValideType(ruleTypes: string[], type: string): boolean {
         const ruleSide = ruleType.split("/");
         const match = (side: number): boolean => {
             Log("type", { ruleSide }, { typeSide });
-            if (ruleSide[side] == "*") return true;
+            if (ruleSide[side] == "*") return !!typeSide[side];
             else if (
                 ruleSide[side].toLocaleLowerCase() == typeSide[side].toLocaleLowerCase()
             )
@@ -48,7 +49,7 @@ export async function FileValidator(
         rule.file.type = rule.file.type || ["*/*"];
         rule.file.type = rule.file.type.length == 0 ? ["*/*"] : rule.file.type;
         rule.file.size = rule.file.size || 2_000_000;
-        rule.file.dir = rule.file.dir || Config.conf.rootDir + "/temp";
+        rule.file.dir = rule.file.dir || Config.conf.fileDir;
         rule.file.length = rule.file.length || 1;
 
         let sizeMin =
@@ -135,7 +136,7 @@ export async function FileValidator(
             for (const i in files) {
                 if (Object.prototype.hasOwnProperty.call(files, i)) {
                     const file = files[i];
-                    const extension = file.type.substring(file.type.indexOf("/") + 1);
+                    const extension =  mime.extension(file.type);
                     const path =
                         rule.file.dir +
                         "/" +
@@ -152,7 +153,7 @@ export async function FileValidator(
                             createdAt: Date.now(),
                         },
                         Config.conf.URL_KEY
-                    );
+                    )+("."+path.substring(path.lastIndexOf('.')));
                     Log('path**', rule.file.dir.replace(Config.conf.rootDir, "") + '/' + dataPath)
                     paths.push(rule.file.dir.replace(Config.conf.rootDir, "") + '/' + dataPath);
                 }
@@ -168,7 +169,7 @@ export async function FileValidator(
             for (const i in files) {
                 if (Object.prototype.hasOwnProperty.call(files, i)) {
                     const file = files[i];
-                    const extension = file.type.substring(file.type.indexOf("/") + 1);
+                    const extension = mime.extension(file.type);
                     const path =
                         rule.file.dir +
                         "/" +
@@ -185,14 +186,15 @@ export async function FileValidator(
                             createdAt: Date.now(),
                         },
                         Config.conf.URL_KEY
-                    );
+                    )+(path.substring(path.lastIndexOf('.')));
                     Log('path**', rule.file.dir.replace(Config.conf.rootDir, "") + '/' + dataPath)
                     paths.push(rule.file.dir.replace(Config.conf.rootDir, "") + '/' + dataPath);
                 }
             }
-            Log("paths", "created", paths);
+            
+           try {
             dataPaths.forEach((dataPath) => {
-                dataPath = dataPath.substring(dataPath.lastIndexOf('/') + 1, dataPath.length)
+                dataPath =  dataPath.substring(dataPath.lastIndexOf('/') + 1).replace(dataPath.substring(dataPath.lastIndexOf('.')),'')
                 Log('onUpdateData', dataPath)
                 const urlData: UrlDataType = (jwt.verify(dataPath, Config.conf.URL_KEY) as UrlDataType)
                 const actualPath = urlData?.realPath;
@@ -206,11 +208,15 @@ export async function FileValidator(
                     });
                 }
             });
+           } catch (error) {
+            
+           }
+            Log("paths", "created", paths);
             return paths;
         },
         delete: async () => {
             dataPaths.forEach((dataPath) => {
-                dataPath = dataPath.substring(dataPath.lastIndexOf('/') + 1, dataPath.length)
+                dataPath = dataPath.substring(dataPath.lastIndexOf('/') + 1).replace(dataPath.substring(dataPath.lastIndexOf('.')),'')
                 Log('onDeleteData', dataPath)
                 const urlData: UrlDataType = (jwt.verify(dataPath, Config.conf.URL_KEY) as UrlDataType)
                 const actualPath = urlData.realPath;

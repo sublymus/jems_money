@@ -1,3 +1,4 @@
+import path from "node:path";
 import { Config } from "./lib/squery/Config";
 
 declare module "./lib/squery/Config" {
@@ -10,7 +11,7 @@ declare module "./lib/squery/Config" {
 
 Config.conf = {
   PORT: 3500,
-  tempDir: "/temp",
+  fileDir: path.join(__dirname, 'fs'),
   tempDuration: 24 * 60 * 60 * 1000,
   URL_KEY: 'Log("<{-_-}>","\\(^_^)/")',
   TOKEN_KEY: 'Log("(-^-)","(- _-)")',

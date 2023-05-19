@@ -1,10 +1,10 @@
 import { accessValidator } from "./AccessManager";
 import { ContextSchema } from "./Context";
 import STATUS from "./Errors/STATUS";
-import { EventPostSchema, EventPreSchema, ModelControllerSchema, ModelFrom_optionSchema, ModelInstanceSchema, MoreSchema, ResponseSchema } from "./Initialize";
+import { EventPostSchema, EventPreSchema, ModelControllerSchema, ModelFrom_optionSchema, ModelInstanceSchema, MoreSchema, ResponseSchema, ResultSchema } from "./Initialize";
 import { formatModelInstance } from "./ModelCtrlManager";
 
-export const readFactory = (controller: ModelControllerSchema, option: ModelFrom_optionSchema & { modelPath: string }, callPost: (e: EventPostSchema) => ResponseSchema, callPre: (e: EventPreSchema) => Promise<void>) => {
+export const readFactory = (controller: ModelControllerSchema, option: ModelFrom_optionSchema & { modelPath: string }, callPost: (e: EventPostSchema) => ResponseSchema, callPre: (e: EventPreSchema) =>Promise<void | ResultSchema>) => {
   return async (ctx: ContextSchema, more: MoreSchema): ResponseSchema => {
     const service = "read";
     ctx = { ...ctx };
@@ -18,7 +18,7 @@ export const readFactory = (controller: ModelControllerSchema, option: ModelFrom
     //Log('auth', { ctx, service, access: option.access, "controller": "" })
     if (!accessValidator({
       ctx,
-      access:option.access,
+      rule:option,
       type: "controller"
       })) {
       return await callPost({
@@ -32,10 +32,11 @@ export const readFactory = (controller: ModelControllerSchema, option: ModelFrom
         },
       });
     }
-    await callPre({
+    const preRes = await callPre({
       ctx,
       more,
     });
+    if(preRes) return preRes
     let modelInstance: ModelInstanceSchema;
     try {
       modelInstance = await option.model.findOne({

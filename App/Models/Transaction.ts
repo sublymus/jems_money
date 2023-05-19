@@ -1,36 +1,39 @@
 import mongoose, { Schema } from "mongoose";
 import { MakeModelCtlForm } from "../../lib/squery/ModelCtrlManager";
 import { SQuery } from "../../lib/squery/SQuery";
-import ManagerModel from "./ManagerModel";
 import { Config } from "../../lib/squery/Config";
 import DiscussionModel from "./DiscussionModel";
 import AccountModel from "./AccountModel";
 import ContactModel from "./ContactModel";
 
 const TransactionSchema = SQuery.Schema({
-  
+  /// start
   senderAccount: {
     type: Schema.Types.ObjectId,
     ref:AccountModel.modelName,
     impact:false,
+    strictAlien:true,
     access:'admin',
   },
+  //full
   receiverContact: {
     type: Schema.Types.ObjectId,
     ref: ContactModel.modelName,
     impact:false,
-    alien:true,
+    strictAlien:true,
     access:'admin',
   },
-  manager: {
-    type: Schema.Types.ObjectId,
-    impact:false,
-    ref: 'manager',
+  codePromo: {
+    type: String,
     access:'admin',
   },
+  sum:{
+    type: Number,
+    access:'admin',
+  },
+  //full
   senderFile: [{
     type: String,
-    required:true,
     file: {
       length: [0, 4],
       type: ['*/*'],
@@ -39,10 +42,16 @@ const TransactionSchema = SQuery.Schema({
     },
     access:'admin',
   }],
-  sum:{
-    type: Number,
+
+  // run 
+  manager: {
+    type: Schema.Types.ObjectId,
+    impact:false,
+    ref: 'manager',
     access:'admin',
   },
+  
+  //end
   managerFile: [{
     type: String,
     file: {
@@ -53,20 +62,15 @@ const TransactionSchema = SQuery.Schema({
     },
     access:'admin',
   }],
-  codePromo: {
-    type: String,
-    access:'admin',
-  },
-
+  
   discussion:{
     type:Schema.Types.ObjectId,
     ref:DiscussionModel.modelName,
-    required:true,
     access:'admin',
   },
   status:{
     type:String,
-    enum:['start','wait','run','end'],
+    enum:['start','full','run','end','cancel'],
     access:'admin',
   }
 });

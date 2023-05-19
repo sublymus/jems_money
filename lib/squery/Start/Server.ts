@@ -40,7 +40,7 @@ const server: ControllerSchema = {
           service: "read",
         },
         type: "controller",
-        access: ModelControllers[ctx.data.modelPath]?.option.access,
+        rule: ModelControllers[ctx.data.modelPath]?.option,
       });
       //Log('Description_valid_access:', valid, '; ctrlAccess:', ModelControllers[ctx.data.modelPath]?.option.access, '; __permission =', ctx.__permission, '; modelPath:',ctx.data.modelPath)
 

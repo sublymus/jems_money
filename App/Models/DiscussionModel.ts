@@ -3,7 +3,6 @@ import { MakeModelCtlForm } from "../../lib/squery/ModelCtrlManager";
 import { SQuery } from "../../lib/squery/SQuery";
 import AccountModel from "./AccountModel";
 import MessageModel from "./MessageModel";
-import Log from "sublymus_logger";
 import { ModelControllers } from "../../lib/squery/Initialize";
 
 let DiscussionSchema = SQuery.Schema({
@@ -14,7 +13,7 @@ let DiscussionSchema = SQuery.Schema({
     impact: false,
     access:'admin',
   },
-  user: {
+  client: {
     type: Schema.Types.ObjectId,
     ref: AccountModel.modelName,
     strictAlien: true,

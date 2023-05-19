@@ -7,12 +7,14 @@ import CountryModel from "./CountryModel";
 import DiscussionModel from "./DiscussionModel";
 import ManagerModel from "./ManagerModel";
 import UserModel from "./UserModel";
+import { ModelControllers } from "../../lib/squery/Initialize";
+import TransactionModel from "./Transaction";
 
 const EntrepriseSchema = SQuery.Schema({
-  transactions: [
+  newTransactions: [
     {
       type: Schema.Types.ObjectId,
-      ref: AccountModel.modelName,
+      ref: TransactionModel.modelName,
       strictAlien: true,
       impact: false,
     },
@@ -48,13 +50,22 @@ const EntrepriseSchema = SQuery.Schema({
   ],
 });
 
-Log("nani", EntrepriseSchema);
 export const EntrepriseModel = mongoose.model("entreprise", EntrepriseSchema);
 
 const maker = MakeModelCtlForm({
   model: EntrepriseModel,
   schema: EntrepriseSchema,
   volatile: true,
-});
+}).pre('create',async ()=>{
 
+  const etp = await ModelControllers['entreprise'].option.model.findOne();
+  if(etp){
+      return {
+          response: etp._id.toString(),
+          code: "OPERATION_SUCCESS",
+          message:'OPERATION_SUCCESS',
+          status: 404
+      }
+  }
+})
 export default EntrepriseModel;

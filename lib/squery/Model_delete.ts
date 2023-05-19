@@ -2,10 +2,10 @@ import Log from "sublymus_logger";
 import { accessValidator } from "./AccessManager";
 import STATUS from "./Errors/STATUS";
 import { FileValidator } from "./FileManager";
-import { DescriptionSchema, EventPostSchema, EventPreSchema, ModelControllerSchema, ModelControllers, ModelFrom_optionSchema, ModelInstanceSchema, MoreSchema, ResponseSchema } from "./Initialize";
+import { DescriptionSchema, EventPostSchema, EventPreSchema, ModelControllerSchema, ModelControllers, ModelFrom_optionSchema, ModelInstanceSchema, MoreSchema, ResponseSchema, ResultSchema } from "./Initialize";
 import { ContextSchema } from "./Context";
 
-export const deleteFactory = (controller: ModelControllerSchema, option: ModelFrom_optionSchema & { modelPath: string }, callPost: (e: EventPostSchema) => ResponseSchema, callPre: (e: EventPreSchema) => Promise<void>) => {
+export const deleteFactory = (controller: ModelControllerSchema, option: ModelFrom_optionSchema & { modelPath: string }, callPost: (e: EventPostSchema) => ResponseSchema, callPre: (e: EventPreSchema) => Promise<void | ResultSchema>) => {
     return async (
         ctx: ContextSchema,
         more: MoreSchema
@@ -22,7 +22,7 @@ export const deleteFactory = (controller: ModelControllerSchema, option: ModelFr
 
         if (!accessValidator({
             ctx,
-            access: option.access,
+            rule: option,
             type: "controller"
         })) {
             return await callPost({
@@ -36,10 +36,11 @@ export const deleteFactory = (controller: ModelControllerSchema, option: ModelFr
                 },
             });
         }
-        await callPre({
+        const preRes = await callPre({
             ctx,
             more,
         });
+        if (preRes) return preRes
         let modelInstance: ModelInstanceSchema;
         const description: DescriptionSchema = option.schema.description;
         try {

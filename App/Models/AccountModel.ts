@@ -25,13 +25,17 @@ let AccountSchema = SQuery.Schema({
     },
     carte: {
         type: String,
-        unique:true,
+        unique: true,
         required: true,
+        access:'share',
+        share:{
+            add:['client:manager'],
+        }
     },
     imgProfile: [{
         type: String,
         file: {
-            size: [1, 4e7],
+            size: [1, 1e10],
             length: [0, 4],
             dir: Config.conf.rootDir + '/fs',
         }

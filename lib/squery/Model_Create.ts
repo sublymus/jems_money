@@ -14,6 +14,7 @@ import {
   ModelInstanceSchema,
   MoreSchema,
   ResponseSchema,
+  ResultSchema,
 } from "./Initialize";
 import { FileValidator, backDestroy } from "./ModelCtrlManager";
 
@@ -21,12 +22,9 @@ export const createFactory = (
   controller: ModelControllerSchema,
   option: ModelFrom_optionSchema & { modelPath: string },
   callPost: (e: EventPostSchema) => ResponseSchema,
-  callPre: (e: EventPreSchema) => Promise<void>
+  callPre: (e: EventPreSchema) => Promise<void| ResultSchema>
 ) => {
-  Log(
-    "oui",
-    "************************************************************************************************************************"
-  );
+
   return async (ctx: ContextSchema, more: MoreSchema): ResponseSchema => {
     const service = option.volatile ? "create" : "store";
     ctx = { ...ctx };
@@ -41,7 +39,7 @@ export const createFactory = (
     if (
       !accessValidator({
         ctx,
-        access: option.access,
+        rule: option,
         type: "controller",
       })
     ) {
@@ -61,10 +59,11 @@ export const createFactory = (
     const description: DescriptionSchema = option.schema.description;
     more.modelId = modelId;
     more.modelPath = option.modelPath;
-    await callPre({
+    const preRes = await callPre({
       ctx,
       more,
     });
+    if(preRes) return preRes
 
     const accu = {};
     let modelInstance: ModelInstanceSchema;

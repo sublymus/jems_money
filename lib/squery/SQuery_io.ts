@@ -12,7 +12,7 @@ export const SQuery_io = (server: any) => {
       return Global.io;
     }
     const io = new Server(server, {
-      maxHttpBufferSize: 1e8,
+      maxHttpBufferSize: 1e10,
       cookie: {
         name: "io",
         path: "/",

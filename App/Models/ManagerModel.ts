@@ -5,12 +5,15 @@ import { SQuery } from "../../lib/squery/SQuery";
 import UserModel from "./UserModel";
 import ManagerPreferenceModel from "./ManagerPreference";
 import DiscussionModel from "./DiscussionModel";
+import TransactionModel from "./Transaction";
+import { access } from "fs";
 
 const managerSchema = SQuery.Schema({
   ...(UserModel.schema as any).description,
   entreprise:{
     type:Schema.Types.ObjectId,
     ref:'entreprise',
+    access:'admin'
   },
   currentDiscussions:[{
     type:Schema.Types.ObjectId,
@@ -26,9 +29,17 @@ const managerSchema = SQuery.Schema({
     impact:false,
     access:'admin'
   }],
+  currentTransactions : [{
+    type: Schema.Types.ObjectId,
+    ref:TransactionModel.modelName,
+    access:'admin',
+    impact:false,
+    strictAlien: true,
+  }],
   managerPreference:{
     type:Schema.Types.ObjectId,
-    ref:ManagerPreferenceModel.modelName
+    ref:ManagerPreferenceModel.modelName,
+    access:'admin'
   }
 });
 export const ManagerModel = mongoose.model("manager", managerSchema);
