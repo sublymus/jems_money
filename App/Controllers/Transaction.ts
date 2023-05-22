@@ -8,6 +8,8 @@ const Transaction: ControllerSchema = {
         const client = await ModelControllers[ctx.signup.modelPath].option.model.findOne({
             _id: ctx.signup.id
         });
+        const {discussionId} = ctx.data;
+
         Log('client', { client });
         if (!client) {
             return {
@@ -61,13 +63,10 @@ const Transaction: ControllerSchema = {
                 addNew: [{
 
                     senderAccount: ctx.login.id,
-                    // receiverContact: ctx.data.receiverContact,
+                    
                     status: 'start',
-                    //sum: ctx.data.sum,
-                    //codePromo: 'azerty',
-                    // discussion: {
-                    //     client: ctx.login.id,
-                    // }
+                    //manager: discussion.manager
+                    //discussion: discussion._id.tostring()
                 }],
                 paging: {
                     query: {
@@ -241,7 +240,7 @@ const Transaction: ControllerSchema = {
                 return {
                     error: "NOT_FOUND",
                     code: "NOT_FOUND",
-                    message: "this transaction allready have a manager ",
+                    message: "this transaction already have a manager ",
                     status: 404
                 }
             }
@@ -403,16 +402,24 @@ const Transaction: ControllerSchema = {
                 }
             }
             Log('transaction',transaction._id)
+            
+            if(transaction.discussion){
+                return {
+                    code: "OPERATION_SUCCESS",
+                    message: "OPERATION_SUCCESS",
+                    response:transaction.discussion,
+                    status: 200
+                }
+            }
             const res = await ModelControllers['transaction']()['update']({
                 ...ctx,
                 __permission: 'admin',
                 __key:transaction.__key.toString(),
-                service: 'update',
                 data: {
                     id: ctx.data.id,
                     discussion: {
                         client: transaction.senderAccount.toString(),
-                        manager:transaction.manager.toString(),
+                        manager:transaction.manager?.toString(),
                         closed: false,
                     },
                     managerFile:ctx.data.managerFile
