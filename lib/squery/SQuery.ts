@@ -124,8 +124,7 @@ const main: MainType = function (socket: Socket) {
       let res: ResultSchema = null;
       let modelRequest =
         !!ModelControllers[ctrlName]?.()[service] &&
-        modelServiceEnabled.includes(service);
-      Log("ERROR_Controller", { modelRequest });
+         modelServiceEnabled.includes(service);
       try {
         if (modelRequest) {
           res = await ModelControllers[ctrlName]?.()[service]?.(ctx);

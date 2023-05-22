@@ -153,7 +153,7 @@ export async function FileValidator(
                             createdAt: Date.now(),
                         },
                         Config.conf.URL_KEY
-                    )+("."+path.substring(path.lastIndexOf('.')));
+                    )+(path.substring(path.lastIndexOf('.')));
                     Log('path**', rule.file.dir.replace(Config.conf.rootDir, "") + '/' + dataPath)
                     paths.push(rule.file.dir.replace(Config.conf.rootDir, "") + '/' + dataPath);
                 }

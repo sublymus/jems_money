@@ -29,7 +29,7 @@ const managerSchema = SQuery.Schema({
     impact:false,
     access:'admin'
   }],
-  currentTransactions : [{
+  managerTransactions : [{
     type: Schema.Types.ObjectId,
     ref:TransactionModel.modelName,
     access:'admin',

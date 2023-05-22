@@ -87,26 +87,51 @@ export const updateFactory = (controller: ModelControllerSchema, option: ModelFr
               "result: ",
               !!rule.strictAlien && !isStr
             );
-            if (!(isAlien && isStr)) continue;
-
             const oldId = modelInstance[p];
-            try {
-              const alienId = ctx.data[p];
-              Log('log',{alienId , oldId})
-              const validId = (await Controllers['server']()['instanceId']({
-                ...ctx,
-                data: {
-                  id: alienId,
-                  modelPath: rule.ref,
+
+            if (rule.strictAlien && !isStr) continue;
+
+            else if (isAlien && isStr){
+              try {
+                const alienId = ctx.data[p];
+                Log('log',{alienId , oldId})
+                const validId = (await Controllers['server']()['instanceId']({
+                  ...ctx,
+                  data: {
+                    id: alienId,
+                    modelPath: rule.ref,
+                  }
+                })).response
+                if (validId) {
+                  modelInstance[p] = alienId;
                 }
-              })).response
-              if (validId) {
-                modelInstance[p] = alienId;
+              } catch (error) {
+                Log("Error_Ilegall_Arg_update_ref", error);
+                continue;
               }
-            } catch (error) {
-              Log("Error_Ilegall_Arg_update_ref", error);
-              continue;
             }
+            else{
+              Log('serperLog',{
+                [p]:ctx.data[p]
+              })
+              try {const ctrl = ModelControllers[rule.ref]();
+                const res =( await (ctrl.create || ctrl.store)({
+                  ...ctx,
+                  data: {
+                    ...ctx.data[p]
+                  }
+                }))
+                Log("erty",res)
+                if (res.response) {
+                  modelInstance[p] = res.response;
+                }
+              } catch (error) {
+                Log("Error_Ilegall_Arg_update_ref", error);
+                continue;
+              }
+            }
+
+           
             try {
              if(!oldId) continue;
 
@@ -114,7 +139,8 @@ export const updateFactory = (controller: ModelControllerSchema, option: ModelFr
               let res: ResultSchema;
               Log("impact", { impact, rule });
               if (impact) {
-                res = await ModelControllers[rule.ref]().delete(
+                const ctrl = ModelControllers[rule.ref]();
+                res = await (ctrl.delete || ctrl.destroy)(
                   {
                     ...ctx,
                     data: { id: oldId },

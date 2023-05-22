@@ -47,7 +47,7 @@ const TransactionSchema = SQuery.Schema({
   manager: {
     type: Schema.Types.ObjectId,
     impact:false,
-    ref: 'manager',
+    ref: AccountModel.modelName,
     access:'admin',
   },
   

@@ -14,7 +14,7 @@ const Messenger: ControllerSchema = {
                 return {
                     error: "NOT_FOUND",
                     code: "NOT_FOUND",
-                    message: "User don't exist",
+                    message: "Client don't exist",
                     status: 404
                 }
             }
@@ -46,7 +46,7 @@ const Messenger: ControllerSchema = {
                 __key:client.__key,
                 data: {
                     addNew: [{
-                            user: ctx.login.id,
+                            client: ctx.login.id,
                             closed: false,
                         }],
                     paging: {

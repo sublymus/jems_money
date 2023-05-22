@@ -92,7 +92,9 @@ export const createFactory = (
         });
         if (!Array.isArray(rule) && rule.ref) {
           const isStr = typeof ctx.data[property] == "string";
+
           const isAlien = !!(rule.alien || rule.strictAlien);
+          Log('vraiment!!',{isStr , isAlien , strict : rule.strictAlien , value : ctx.data[property] , property});
           // Log(
           //     "alien",
           //     "strictAlien: ",
@@ -113,7 +115,7 @@ export const createFactory = (
                 status: 404,
                 code: "ILLEGAL_ARGUMENT",
                 message:
-                  "the property not a alien.. ; value must be creation data object;" +
+                  "the property not a alien @01 ; value must be creation data object;" +
                   "<" +
                   option.modelPath +
                   ">:<" +
@@ -156,7 +158,7 @@ export const createFactory = (
                     option.modelPath +
                     ">:<" +
                     service +
-                    "> , can not create child :<" +
+                    "> , can not create child @02:<" +
                     property +
                     ">, ref = <" +
                     rule.ref +
@@ -182,7 +184,7 @@ export const createFactory = (
                   option.modelPath +
                   ">:<" +
                   service +
-                  "> , can not create child :<" +
+                  "> , can not create child @03:<" +
                   property +
                   ">, ref = <" +
                   rule.ref +
@@ -232,7 +234,7 @@ export const createFactory = (
                   option.modelPath +
                   ">:<" +
                   service +
-                  "> , can not create child :<" +
+                  "> , can not create child @04:<" +
                   property +
                   ">, ref = <" +
                   rule.ref +
@@ -278,7 +280,7 @@ export const createFactory = (
                     option.modelPath +
                     ">:<" +
                     service +
-                    "> , can not create child :<" +
+                    "> , can not create child @05:<" +
                     property +
                     ">, ref = <" +
                     rule[0].ref +
@@ -316,7 +318,7 @@ export const createFactory = (
                       option.modelPath +
                       ">:<" +
                       service +
-                      "> , can not create child :<" +
+                      "> , can not create child@06:<" +
                       property +
                       ">, ref = <" +
                       rule[0].ref +
@@ -342,7 +344,7 @@ export const createFactory = (
                     option.modelPath +
                     ">:<" +
                     service +
-                    "> , can not create child :<" +
+                    "> , can not create child @07:<" +
                     property +
                     ">, ref = <" +
                     rule[0].ref +

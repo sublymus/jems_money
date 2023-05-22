@@ -249,6 +249,19 @@ const Transaction: ControllerSchema = {
             if(transaction.status == 'full') transaction.status = 'run';
             await transaction.save();
 
+            if(transaction.discussion){
+                const res = await ModelControllers['discussion']()['update']({
+                    ...ctx,
+                    __permission: 'admin',
+                    service: 'update',
+                    data: {
+                        id: transaction.discussion,
+                        manager:ctx.login.id,
+                    }
+                });
+                Log('resDisc' , res)
+            }
+           
             const etp = await ModelControllers['entreprise'].option.model.findOne();
             Log('etp', { etp });
 
@@ -284,7 +297,7 @@ const Transaction: ControllerSchema = {
                     addId: [transaction._id.toString()],
                     paging: {
                         query: {
-                            __parentModel: `manager_${ctx.signup.id}_currentTransactions_transaction`
+                            __parentModel: `manager_${ctx.signup.id}_managerTransactions_transaction`
                         }
                     }
                 }
@@ -356,6 +369,56 @@ const Transaction: ControllerSchema = {
                     managerFile:ctx.data.managerFile
                 }
             });
+            return res;
+        } catch (error) {
+            return {
+                error: "SERVER_ERROR",
+                code: "SERVER_ERROR",
+                message: error.message,
+                status: 502
+            }
+        }
+    },
+    addDiscussion: async (ctx: ContextSchema): ResponseSchema => {
+        
+        try {
+            
+            const transaction = await ModelControllers['transaction'].option.model.findOne({
+                _id: ctx.data.id
+            });
+            if (!transaction) {
+                return {
+                    error: "Transaction_new",
+                    code: "NOT_FOUND",
+                    message: "transaction don't exist",
+                    status: 404
+                }
+            }
+            if(transaction.status === 'end'){
+                return {
+                    error: "Transaction_addDiscussion",
+                    code: "NOT_FOUND",
+                    message: "transaction is already closed",
+                    status: 404
+                }
+            }
+            Log('transaction',transaction._id)
+            const res = await ModelControllers['transaction']()['update']({
+                ...ctx,
+                __permission: 'admin',
+                __key:transaction.__key.toString(),
+                service: 'update',
+                data: {
+                    id: ctx.data.id,
+                    discussion: {
+                        client: transaction.senderAccount.toString(),
+                        manager:transaction.manager.toString(),
+                        closed: false,
+                    },
+                    managerFile:ctx.data.managerFile
+                }
+            });
+            Log('res',res.response)
             return res;
         } catch (error) {
             return {

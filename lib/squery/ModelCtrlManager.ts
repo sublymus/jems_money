@@ -250,6 +250,8 @@ async function backDestroy(ctx: ContextSchema, more: MoreSchema) {
     return promises.push(p);
   });
   const log = await Promise.allSettled(promises);
+  console.log(log);
+  
   more.savedlist = [];
   return;
 }

@@ -167,11 +167,11 @@ export class Deep extends BaseComponent {
                         // input.value = await this.instance[data.property]
                     });
                     $(btn, 'h1').addEventListener('click', async () => {
-                        if(!this.instance.$cache[data.property])return
+                        if(!await this.instance[data.property])return
                         this.emit('hide');
                         this.container.append(_('Deep', {
                             ...data,
-                            id: this.instance.$cache[data.property],
+                            id: await this.instance[data.property],
                             parentCpn: this,
                             container: this.container,
                         }));

@@ -23,6 +23,7 @@ let DiscussionSchema = SQuery.Schema({
   messages: [{
     type: Schema.Types.ObjectId,
     ref: MessageModel.modelName,
+    impact:false,
     access: 'public',
   }],
   closed: {
