@@ -5,7 +5,7 @@ import { ControllerSchema, ModelControllers, ModelInstanceSchema, ResponseSchema
 
 const Transaction: ControllerSchema = {
     start: async (ctx: ContextSchema): ResponseSchema => {
-        const client = await ModelControllers[ctx.signup.modelPath].option.model.findOne({
+        const client = await ModelControllers[ctx.signup.modelPath]?.option.model.findOne({
             _id: ctx.signup.id
         });
         const {discussionId} = ctx.data;
@@ -44,7 +44,7 @@ const Transaction: ControllerSchema = {
                 status: 200
             }
         }
-        const etp = await ModelControllers['entreprise'].option.model.findOne();
+        const etp = await ModelControllers['entreprise']?.option.model.findOne();
         Log('etp', { etp });
 
         if (!etp) {
@@ -108,27 +108,48 @@ const Transaction: ControllerSchema = {
             ...ctx,
             __permission: 'admin',
             service: 'update',
-            data: {
-                id: ctx.data.id,
-                receiverContact: ctx.data.receiverContact,
-                sum: ctx.data.sum,
-                codePromo: ctx.data.codePromo,
-                senderFile:ctx.data.senderFile
-                // discussion: {
-                //     client: ctx.login.id,
-                // }
-            }
+            data: ctx.data,
+            // {
+
+                // id: ctx.data.id,
+                // receiverContact: ctx.data.receiverContact,
+                // sum: ctx.data.sum,
+                // codePromo: ctx.data.codePromo,
+                // senderFile:ctx.data.senderFile
+                // country: {
+                //     type: Schema.Types.ObjectId,
+                //     ref: CountryModel.modelName,
+                //     strictAlien: true,
+                //     impact: false,
+                // },
+                // telephone: {
+                //     type: String,
+                // },
+                // carte: {
+                //     type: String
+                // },
+                // agence: {
+                //     type: Schema.Types.ObjectId,
+                //     ref: 'agence',
+                //     strictAlien: true,
+                //     impact: false,
+                // },
+                // typeTransaction: {
+                //     type: String,
+                // },
+                // 
+            // }
         });
 
         if (res.error) return res;
 
-        const transaction = await ModelControllers['transaction'].option.model.findOne({
+        const transaction = await ModelControllers['transaction']?.option.model.findOne({
             _id: ctx.data.id
         });
 
         if (!transaction) {
             return {
-                error: "Transaction_new",
+                error: "Transaction_full",
                 code: "NOT_FOUND",
                 message: "transaction don't exist",
                 status: 404
@@ -155,6 +176,38 @@ const Transaction: ControllerSchema = {
                 error: "Transaction_new",
                 code: "NOT_FOUND",
                 message: "transaction.senderFile don't exist",
+                status: 404
+            }
+        }
+        if (!transaction.country) {
+            return {
+                error: "Transaction_new",
+                code: "NOT_FOUND",
+                message: "transaction.country don't exist",
+                status: 404
+            }
+        }
+        if (!transaction.telephone || transaction.carte  ) {
+            return {
+                error: "Transaction_new",
+                code: "NOT_FOUND",
+                message: "transaction.telephone or transaction.carte  don't exist",
+                status: 404
+            }
+        }
+        if (!transaction.agence) {
+            return {
+                error: "Transaction_new",
+                code: "NOT_FOUND",
+                message: "transaction.agence don't exist",
+                status: 404
+            }
+        }
+        if (!transaction.typeTransaction ) {
+            return {
+                error: "Transaction_new",
+                code: "NOT_FOUND",
+                message: "transaction.typeTransaction don't exist",
                 status: 404
             }
         }
@@ -193,7 +246,7 @@ const Transaction: ControllerSchema = {
                 status: 404
             }
         }
-        const manager = await ModelControllers['manager'].option.model.findOne({ _id: ctx.signup.id });
+        const manager = await ModelControllers['manager']?.option.model.findOne({ _id: ctx.signup.id });
         Log('manager', { manager });
         if (!manager) {
             return {
@@ -216,7 +269,7 @@ const Transaction: ControllerSchema = {
                     status: 404
                 }
             }
-            const manager = await ModelControllers['manager'].option.model.findOne({ _id: ctx.signup.id });
+            const manager = await ModelControllers['manager']?.option.model.findOne({ _id: ctx.signup.id });
             Log('manager', { manager });
             if (!manager) {
                 return {
@@ -226,7 +279,7 @@ const Transaction: ControllerSchema = {
                     status: 404
                 }
             }
-            const transaction: ModelInstanceSchema = await ModelControllers['transaction'].option.model.findOne({ _id: ctx.data.id });
+            const transaction: ModelInstanceSchema = await ModelControllers['transaction']?.option.model.findOne({ _id: ctx.data.id });
             Log('transaction', { transaction });
             if (!transaction) {
                 return {
@@ -261,7 +314,7 @@ const Transaction: ControllerSchema = {
                 Log('resDisc' , res)
             }
            
-            const etp = await ModelControllers['entreprise'].option.model.findOne();
+            const etp = await ModelControllers['entreprise']?.option.model.findOne();
             Log('etp', { etp });
 
             if (!etp) {
@@ -329,7 +382,7 @@ const Transaction: ControllerSchema = {
                     status: 404
                 }
             }
-            const manager = await ModelControllers['manager'].option.model.findOne({ _id: ctx.signup.id });
+            const manager = await ModelControllers['manager']?.option.model.findOne({ _id: ctx.signup.id });
             Log('manager', { manager });
             if (!manager) {
                 return {
@@ -339,7 +392,7 @@ const Transaction: ControllerSchema = {
                     status: 404
                 }
             }
-            const transaction = await ModelControllers['transaction'].option.model.findOne({
+            const transaction = await ModelControllers['transaction']?.option.model.findOne({
                 _id: ctx.data.id
             });
             if (!transaction) {
@@ -382,7 +435,7 @@ const Transaction: ControllerSchema = {
         
         try {
             
-            const transaction = await ModelControllers['transaction'].option.model.findOne({
+            const transaction = await ModelControllers['transaction']?.option.model.findOne({
                 _id: ctx.data.id
             });
             if (!transaction) {
@@ -439,7 +492,7 @@ const Transaction: ControllerSchema = {
 }
 
 async function updateTransaction(ctx: ContextSchema, lastVal: string, newVal: string) {
-    const transaction = await ModelControllers['transaction'].option.model.findOne({
+    const transaction = await ModelControllers['transaction']?.option.model.findOne({
         _id: ctx.data.id
     });
     if (!transaction) {

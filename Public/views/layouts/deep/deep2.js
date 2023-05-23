@@ -130,8 +130,7 @@ export class Deep extends BaseComponent {
                             } else {
                                 // //console.log('********', rule, property, this.instance);
                                 this.emit('createInput', {
-
-
+                                    
                                     data: {
                                         property: property,
                                         value: await this.instance[property],
@@ -167,11 +166,11 @@ export class Deep extends BaseComponent {
                         // input.value = await this.instance[data.property]
                     });
                     $(btn, 'h1').addEventListener('click', async () => {
-                        if(!await this.instance[data.property])return
+                        
                         this.emit('hide');
                         this.container.append(_('Deep', {
                             ...data,
-                            id: await this.instance[data.property],
+                            id: (await this.instance[data.property]).$id,
                             parentCpn: this,
                             container: this.container,
                         }));

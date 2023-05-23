@@ -227,7 +227,7 @@ export type TypeRuleSchema = {
     size?: number | [number, number];
     length?: number | [number, number];
     type?: string[]
-    dir?: string;
+    dir?: string[];
   },
   ref?: string;
   default?: valueSchema;

@@ -2,7 +2,6 @@ import mongoose, { Schema } from "mongoose";
 import { MakeModelCtlForm } from "../../lib/squery/ModelCtrlManager";
 import { SQuery } from "../../lib/squery/SQuery";
 import AccountModel from "./AccountModel";
-import ContactModel from "./ContactModel";
 import MessengerModel from "./MessengerModel";
 import TransactionModel from "./Transaction";
 import UserPreferenceModel from "./UserPreference";
@@ -12,14 +11,6 @@ let userSchema = SQuery.Schema({
     type: Schema.Types.ObjectId,
     ref: AccountModel.modelName,
   },
-  contacts: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: ContactModel.modelName,
-      alien: true,
-      access: "private",
-    },
-  ],
   transactions: [
     {
       type: Schema.Types.ObjectId,

@@ -1,3 +1,4 @@
+import Log from "sublymus_logger";
 import { Config } from "./Config";
 import { ContextSchema } from "./Context";
 import { ModelAccessAvailable, ModelControllers, UrlDataType } from "./Initialize";
@@ -9,10 +10,14 @@ export const SQuery_files = {
       let urlData: UrlDataType;
       try {
         if (!url) throw new Error('url is missing;');
+        
         url =  url.substring(url.lastIndexOf('/') + 1).replace(url.substring(url.lastIndexOf('.')),'')
+        Log('url',{url})
         urlData = jwt.verify(url, Config.conf.URL_KEY) as any;
+        Log('uurlDatarl',{urlData})
         if (!urlData) throw new Error('invalid url , urlData  is missing');
         const rule = ModelControllers[urlData.modelPath]?.option.schema.description[urlData.property];
+        Log('rule',{rule})
         if (!rule || !Array.isArray(rule)) throw new Error('invalid url, rule not found');
         let access: ModelAccessAvailable;
         access = rule[0].access;

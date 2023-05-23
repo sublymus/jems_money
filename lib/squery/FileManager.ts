@@ -1,11 +1,11 @@
 import Log from "sublymus_logger";
 import { ContextSchema } from "./Context";
-import  mime from "mime-types"; 
 import { FileSchema, ModelServiceAvailable, TypeRuleSchema, UrlDataType } from "./Initialize";
 import fs from "node:fs";
 import { Config } from "./Config";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+import path from "node:path";
 
 function isValideType(ruleTypes: string[], type: string): boolean {
     const typeSide = (type || "").split("/");
@@ -108,11 +108,12 @@ export async function FileValidator(
             }
         }
     }
-
+    const ruleFileDir = path.join(...rule.file.dir)
+    Log('ruleFileDir', {ruleFileDir})
     await new Promise((res, rej) => {
-        if (!fs.existsSync(rule.file.dir)) {
+        if (!fs.existsSync(ruleFileDir)) {
             fs.mkdir(
-                rule.file.dir,
+                ruleFileDir,
                 {
                     recursive: true,
                 },
@@ -129,16 +130,16 @@ export async function FileValidator(
             res("");
         }
     });
-
+    Log('ok','ok')
     const Map = {
         create: async () => {
             const paths: string[] = [];
             for (const i in files) {
                 if (Object.prototype.hasOwnProperty.call(files, i)) {
                     const file = files[i];
-                    const extension =  mime.extension(file.type);
+                    const extension =  file.type.split('/').pop();
                     const path =
-                        rule.file.dir +
+                         ruleFileDir +
                         "/" +
                         Date.now() +
                         "_" +
@@ -154,8 +155,8 @@ export async function FileValidator(
                         },
                         Config.conf.URL_KEY
                     )+(path.substring(path.lastIndexOf('.')));
-                    Log('path**', rule.file.dir.replace(Config.conf.rootDir, "") + '/' + dataPath)
-                    paths.push(rule.file.dir.replace(Config.conf.rootDir, "") + '/' + dataPath);
+                    Log('path**', (rule.file.dir.filter((p,i)=> i>0)).join('/') + '/' + dataPath)
+                    paths.push((rule.file.dir.filter((p,i)=> i>0)).join('/')  + '/' + dataPath);
                 }
             }
             Log("paths", "created", paths);
@@ -169,9 +170,9 @@ export async function FileValidator(
             for (const i in files) {
                 if (Object.prototype.hasOwnProperty.call(files, i)) {
                     const file = files[i];
-                    const extension = mime.extension(file.type);
+                    const extension = file.type.split('/').pop();
                     const path =
-                        rule.file.dir +
+                    ruleFileDir +
                         "/" +
                         Date.now() +
                         "_" +
@@ -179,6 +180,7 @@ export async function FileValidator(
                         "." +
                         extension;
                     fs.writeFileSync(path, file.buffer, file.encoding || "binary");
+                    
                     const dataPath = jwt.sign(
                         {
                             realPath: path.replace(Config.conf.rootDir, ""),
@@ -187,8 +189,8 @@ export async function FileValidator(
                         },
                         Config.conf.URL_KEY
                     )+(path.substring(path.lastIndexOf('.')));
-                    Log('path**', rule.file.dir.replace(Config.conf.rootDir, "") + '/' + dataPath)
-                    paths.push(rule.file.dir.replace(Config.conf.rootDir, "") + '/' + dataPath);
+                    Log('path**', (rule.file.dir.filter((p,i)=> i>0)).join('/') + '/' + dataPath)
+                    paths.push((rule.file.dir.filter((p,i)=> i>0)).join('/')  + '/' + dataPath);
                 }
             }
             
@@ -238,3 +240,5 @@ export async function FileValidator(
 
     return await Map[service]();
 }
+
+;

@@ -15,7 +15,7 @@ export async function createInstanceFrom({ modelPath, id, Model }) {
     let lastInstanceUpdateAt = 0;
     const refresh = async () => {
         await new Promise((rev) => {
-            SQuery.emit( modelPath + ':read', {
+            SQuery.emit(modelPath + ':read', {
                 id: id,
             }, async (res) => {
                 if (res.error) throw new Error(JSON.stringify(res));
@@ -64,7 +64,13 @@ export async function createInstanceFrom({ modelPath, id, Model }) {
     });
     //////
     async function emitRefresh(properties) {
-        emiter.emit('refresh', instance);
+        let Objproperties = {};
+
+        for (let index = 0; index < properties.length; index++) {
+            const property = properties[index];
+            Objproperties[property] = await (instance[property]);
+        }
+        emiter.emit('refresh', Objproperties);
         if (properties) {
             properties.forEach(async (p) => {
                 emiter.emit('refresh:' + p, {
