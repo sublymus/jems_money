@@ -108,7 +108,7 @@ const Transaction: ControllerSchema = {
             ...ctx,
             __permission: 'admin',
             service: 'update',
-            data: ctx.data,
+            data: {...ctx.data},
             // {
 
                 // id: ctx.data.id,
@@ -184,6 +184,14 @@ const Transaction: ControllerSchema = {
                 error: "Transaction_new",
                 code: "NOT_FOUND",
                 message: "transaction.country don't exist",
+                status: 404
+            }
+        }
+        if (!transaction.receiverName) {
+            return {
+                error: "Transaction_new",
+                code: "NOT_FOUND",
+                message: "transaction.receiverName don't exist",
                 status: 404
             }
         }

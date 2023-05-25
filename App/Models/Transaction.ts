@@ -22,6 +22,9 @@ const TransactionSchema = SQuery.Schema({
     strictAlien: true,
     impact: false,
   },
+  receiverName:{
+    type:String
+  },
   telephone: {
     type: String,
   },
@@ -52,7 +55,7 @@ const TransactionSchema = SQuery.Schema({
       length: [0, 4],
       type: ['*/*'],
       size: [1, 4e7],
-      dir: [Config.conf.rootDir,'/fs'],
+      dir: [Config.conf.rootDir,'fs'],
     },
     access: 'admin',
   }],
@@ -72,7 +75,7 @@ const TransactionSchema = SQuery.Schema({
       length: [0, 4],
       type: ['*/*'],
       size: [0, 4e7],
-      dir:[Config.conf.rootDir,'/fs'],
+      dir:[Config.conf.rootDir,'fs'],
     },
     access: 'admin',
   }],

@@ -155,8 +155,10 @@ export async function FileValidator(
                         },
                         Config.conf.URL_KEY
                     )+(path.substring(path.lastIndexOf('.')));
-                    Log('path**', (rule.file.dir.filter((p,i)=> i>0)).join('/') + '/' + dataPath)
-                    paths.push((rule.file.dir.filter((p,i)=> i>0)).join('/')  + '/' + dataPath);
+                    let p = (rule.file.dir.filter((p,i)=> i>0)).join('/')  + '/' + dataPath;
+                    p = p.startsWith('/')? p : '/'+p
+                    Log('path**', p)
+                    paths.push(p);
                 }
             }
             Log("paths", "created", paths);
@@ -189,8 +191,10 @@ export async function FileValidator(
                         },
                         Config.conf.URL_KEY
                     )+(path.substring(path.lastIndexOf('.')));
-                    Log('path**', (rule.file.dir.filter((p,i)=> i>0)).join('/') + '/' + dataPath)
-                    paths.push((rule.file.dir.filter((p,i)=> i>0)).join('/')  + '/' + dataPath);
+                    let p = (rule.file.dir.filter((p,i)=> i>0)).join('/')  + '/' + dataPath;
+                    p = p.startsWith('/')? p : '/'+p
+                    Log('path**', p)
+                    paths.push(p);
                 }
             }
             
