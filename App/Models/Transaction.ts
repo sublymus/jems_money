@@ -1,10 +1,10 @@
 import mongoose, { Schema } from "mongoose";
+import { Config } from "../../lib/squery/Config";
 import { MakeModelCtlForm } from "../../lib/squery/ModelCtrlManager";
 import { SQuery } from "../../lib/squery/SQuery";
-import { Config } from "../../lib/squery/Config";
-import DiscussionModel from "./DiscussionModel";
 import AccountModel from "./AccountModel";
 import CountryModel from "./CountryModel";
+import DiscussionModel from "./DiscussionModel";
 
 const TransactionSchema = SQuery.Schema({
   /// start
@@ -13,7 +13,7 @@ const TransactionSchema = SQuery.Schema({
     ref: AccountModel.modelName,
     impact: false,
     strictAlien: true,
-    access: 'admin',
+    access: "admin",
   },
   //full
   country: {
@@ -26,11 +26,11 @@ const TransactionSchema = SQuery.Schema({
     type: String,
   },
   carte: {
-    type: String
+    type: String,
   },
   agence: {
     type: Schema.Types.ObjectId,
-    ref: 'agence',
+    ref: "agence",
     strictAlien: true,
     impact: false,
   },
@@ -39,56 +39,69 @@ const TransactionSchema = SQuery.Schema({
   },
   codePromo: {
     type: String,
-    access: 'admin',
+    access: "admin",
+  },
+  receiverName: {
+    type: String,
+    trim: true,
+    minlength: [3, "trop court"],
+    maxlength: [20, "trop long"],
   },
   sum: {
     type: Number,
-    access: 'admin',
+    access: "admin",
   },
   //full
-  senderFile: [{
-    type: String,
-    file: {
-      length: [0, 4],
-      type: ['*/*'],
-      size: [1, 4e7],
-      dir: [Config.conf.rootDir,'/fs'],
+  senderFile: [
+    {
+      type: String,
+      file: {
+        length: [0, 4],
+        type: ["*/*"],
+        size: [1, 4e7],
+        dir: [Config.conf.rootDir, "/fs"],
+      },
+      access: "admin",
     },
-    access: 'admin',
-  }],
+  ],
 
-  // run 
+  // run
   manager: {
     type: Schema.Types.ObjectId,
     impact: false,
     ref: AccountModel.modelName,
-    access: 'admin',
+    access: "admin",
   },
 
   //end
-  managerFile: [{
-    type: String,
-    file: {
-      length: [0, 4],
-      type: ['*/*'],
-      size: [0, 4e7],
-      dir:[Config.conf.rootDir,'/fs'],
+  managerFile: [
+    {
+      type: String,
+      file: {
+        length: [0, 4],
+        type: ["*/*"],
+        size: [0, 4e7],
+        dir: [Config.conf.rootDir, "/fs"],
+      },
+      access: "admin",
     },
-    access: 'admin',
-  }],
+  ],
 
   discussion: {
     type: Schema.Types.ObjectId,
     ref: DiscussionModel.modelName,
-    access: 'admin',
+    access: "admin",
   },
   status: {
     type: String,
-    enum: ['start', 'full', 'run', 'end', 'cancel'],
-    access: 'admin',
-  }
+    enum: ["start", "full", "run", "end", "cancel"],
+    access: "admin",
+  },
 });
-export const TransactionModel = mongoose.model("transaction", TransactionSchema);
+export const TransactionModel = mongoose.model(
+  "transaction",
+  TransactionSchema
+);
 
 /*
 
@@ -113,7 +126,6 @@ INSTANCE.when('refresh:PROPERTY',(PROPERTY_VALUE)=>{
 */
 
 //createAsyncThunk
-
 
 const maker = MakeModelCtlForm({
   model: TransactionModel,

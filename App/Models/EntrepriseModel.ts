@@ -1,14 +1,11 @@
 import mongoose, { Schema } from "mongoose";
-import Log from "sublymus_logger";
+import { ModelControllers } from "../../lib/squery/Initialize";
 import { MakeModelCtlForm } from "../../lib/squery/ModelCtrlManager";
 import { SQuery } from "../../lib/squery/SQuery";
-import AccountModel from "./AccountModel";
 import CountryModel from "./CountryModel";
-import DiscussionModel from "./DiscussionModel";
 import ManagerModel from "./ManagerModel";
-import UserModel from "./UserModel";
-import { ModelControllers } from "../../lib/squery/Initialize";
 import TransactionModel from "./Transaction";
+import UserModel from "./UserModel";
 
 const EntrepriseSchema = SQuery.Schema({
   newTransactions: [
@@ -25,12 +22,18 @@ const EntrepriseSchema = SQuery.Schema({
       ref: ManagerModel.modelName,
     },
   ],
+
   users: [
     {
       type: Schema.Types.ObjectId,
       ref: UserModel.modelName,
     },
   ],
+  rates: {
+    type: Map,
+    //@ts-ignore
+    of: Number,
+  },
   serviceCharge: {
     type: Number,
   },
@@ -40,14 +43,14 @@ const EntrepriseSchema = SQuery.Schema({
       ref: CountryModel.modelName,
     },
   ],
-  openedDiscussion: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: DiscussionModel.modelName,
-      impact: false,
-      strictAlien: true,
-    },
-  ],
+  // openedDiscussion: [
+  //   {
+  //     type: Schema.Types.ObjectId,
+  //     ref: DiscussionModel.modelName,
+  //     impact: false,
+  //     strictAlien: true,
+  //   },
+  // ],
 });
 
 export const EntrepriseModel = mongoose.model("entreprise", EntrepriseSchema);
@@ -56,16 +59,15 @@ const maker = MakeModelCtlForm({
   model: EntrepriseModel,
   schema: EntrepriseSchema,
   volatile: true,
-}).pre('create',async ()=>{
-
-  const etp = await ModelControllers['entreprise'].option.model.findOne();
-  if(etp){
-      return {
-          response: etp._id.toString(),
-          code: "OPERATION_SUCCESS",
-          message:'OPERATION_SUCCESS',
-          status: 404
-      }
+}).pre("create", async () => {
+  const etp = await ModelControllers["entreprise"].option.model.findOne();
+  if (etp) {
+    return {
+      response: etp._id.toString(),
+      code: "OPERATION_SUCCESS",
+      message: "OPERATION_SUCCESS",
+      status: 404,
+    };
   }
-})
+});
 export default EntrepriseModel;
