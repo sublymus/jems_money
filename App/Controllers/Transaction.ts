@@ -148,9 +148,8 @@ const Transaction: ControllerSchema = {
       ...ctx,
       __permission: "admin",
       service: "update",
-      data: { ...ctx.data },
-
-      // {jjj
+      data: ctx.data,
+      // {
 
       // id: ctx.data.id,
       // receiverContact: ctx.data.receiverContact,
@@ -207,11 +206,11 @@ const Transaction: ControllerSchema = {
         status: 404,
       };
     }
-    if (!transaction.receiverName) {
+    if (!transaction.receiverContact) {
       return {
         error: "Transaction_new",
         code: "NOT_FOUND",
-        message: "transaction.receiverName don't exist",
+        message: "transaction.receiverContact don't exist",
         status: 404,
       };
     }
@@ -231,7 +230,7 @@ const Transaction: ControllerSchema = {
         status: 404,
       };
     }
-    if (!(transaction.telephone || transaction.carte)) {
+    if (!transaction.telephone || transaction.carte) {
       return {
         error: "Transaction_new",
         code: "NOT_FOUND",

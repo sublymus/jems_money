@@ -36,7 +36,7 @@ let AccountSchema = SQuery.Schema({
         file: {
             size: [1, 1e10],
             length: [0, 4],
-            dir: [Config.conf.rootDir,'/fs'],
+            dir: [Config.conf.rootDir,'fs'],
         }
     }]
 });

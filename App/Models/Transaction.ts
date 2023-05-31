@@ -22,6 +22,7 @@ const TransactionSchema = SQuery.Schema({
     strictAlien: true,
     impact: false,
   },
+
   telephone: {
     type: String,
   },
@@ -52,6 +53,7 @@ const TransactionSchema = SQuery.Schema({
     access: "admin",
   },
   //full
+
   senderFile: [
     {
       type: String,
@@ -74,6 +76,7 @@ const TransactionSchema = SQuery.Schema({
   },
 
   //end
+
   managerFile: [
     {
       type: String,
