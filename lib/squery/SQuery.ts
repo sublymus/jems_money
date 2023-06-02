@@ -37,10 +37,10 @@ type GlobalSchema = {
   io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>|null;
 };
 type SQuerySchema = ((
-  socket: Socket|null
+  socket: Socket|null|undefined
 ) => (
   ctrlName: string,
-  service: AllowedModelService
+  service: string,
 ) => (data: DataSchema, cb?: CallBack) => Promise<void>) & {
   emiter: EventEmiter;
   io: (server?: any) => Server|null;
@@ -51,9 +51,9 @@ type SQuerySchema = ((
   };
   service: (
     ctrlName: string,
-    service: AllowedModelService,
+    service: string,
     data: DataSchema,
-    ctx: ContextSchema
+    ctx?: ContextSchema
   ) => Promise<any>;
   cookies(socket: Socket|null|undefined|string, key?: string, value?: any): Promise<any>;
 };
@@ -114,7 +114,7 @@ const main: MainType = function (socket: Socket) {
         service,
         data
       );
-        Log('Cookie_result',await SQuery.cookies(socket.request.headers.cookie ,'' , 'token'));
+        Log('Cookie_result',await SQuery.cookies(socket?.request.headers.cookie ,'' , 'token'));
       const midList = [...GlobalMiddlewares];
 
       for (let i = 0; i < midList.length; i++) {

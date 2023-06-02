@@ -21,6 +21,11 @@ app.get("/test", (req, res) => {
 app.get("/", (req, res) => {
   res.redirect("/test.html");
 });
+app.get("/create", async(req, res) => {
+  const data = await SQuery.service('server','description',{modelPath:'account'});
+  res.send(data);
+
+});
 
 app.get("*", async (req, res) => {
   if (req.path.startsWith("/fs")) {

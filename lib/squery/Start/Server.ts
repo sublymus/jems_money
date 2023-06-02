@@ -34,6 +34,14 @@ const server: ControllerSchema = {
   },
   description: async (ctx: ContextSchema): ResponseSchema => {
     try {
+      if(!ctx.data.modelPath){
+        return {
+          error: "OPERATION_FAILED",
+          status: 404,
+          code: "OPERATION_FAILED",
+          message: 'modelPath is missing in data',
+        };
+      }
       const valid = accessValidator({
         ctx: {
           ...ctx,

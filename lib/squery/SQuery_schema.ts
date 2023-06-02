@@ -1,3 +1,4 @@
+import { access } from 'fs';
 import { FlatRecord, ResolveSchemaOptions, Schema, SchemaOptions } from "mongoose";
 import { DescriptionSchema, SQueryMongooseSchema } from "./Initialize";
 import { Global, SQuery } from "./SQuery";
@@ -43,14 +44,18 @@ export const SQuery_Schema = (description: DescriptionSchema , options?:SchemaOp
       access: 'public'
     };
     const schema = new Schema(description as any,{
-
+      ...options
     });
+
     schema.plugin(mongoosePaginate);
     schema.plugin(mongoose_unique_validator);
   
     schema.pre("save", async function () {
       this.__updatedAt = Date.now();
-      this.__updatedProperty = this.modifiedPaths();
+      this.__updatedProperty = (this.modifiedPaths() as string[]).filter((updatedProperty)=>{
+        const rule = description[updatedProperty];
+        return Array.isArray(rule)? rule[0].access !=='secret': rule.access !=='secret';
+      });
     });
   
     schema.post("save", async function (doc: any) {
