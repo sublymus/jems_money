@@ -16,5 +16,5 @@ Config.conf = {
   URL_KEY: 'Log("<{-_-}>","\\(^_^)/")',
   TOKEN_KEY: 'Log("(-^-)","(- _-)")',
   rootDir: __dirname,
-  execDir: ["/App/Models", "/App/Controllers", "/App/Tools", "/Start"],
+  execDir: ["/App/Models", "/App/Controllers", "/Start"],
 };

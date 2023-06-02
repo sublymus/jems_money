@@ -14,7 +14,9 @@ import {
   ModelFrom_optionSchema,
   ModelInstanceSchema,
   ModelServiceAvailable,
+  Model_optionSchema,
   MoreSchema,
+  PopulateAllSchema,
   PopulateSchema,
   ResponseSchema,
   ResultSchema,
@@ -27,22 +29,64 @@ import { deleteFactory } from "./Model_delete";
 import { listFactory } from "./Model_list";
 import { readFactory } from "./Model_read";
 import { updateFactory } from "./Model_update";
+import mongoose from "mongoose";
+
+
+export const UNDIFINED_RESULT : ResultSchema= {
+status:404,
+message:'UNDEFINED_RESULT',
+error:'UNDEFINED_RESULT',
+code:'UNDEFINED_RESULT',
+}
+
 const MakeModelCtlForm: (
   options: ModelFrom_optionSchema
 ) => CtrlModelMakerSchema = (
   options: ModelFrom_optionSchema
 ): CtrlModelMakerSchema => {
-    const option: ModelFrom_optionSchema & { modelPath: string } = {
+
+ 
+   type CompletModel = mongoose.Model<any, unknown, unknown, unknown, any> &{__findOne: (filter?: any, projection?: any, options?: any, callback?: any)=>Promise<ModelInstanceSchema> };
+  const  completModel:CompletModel = options.model as CompletModel;
+  const option: Model_optionSchema= {
       ...options,
+      volatile: options.volatile??false,
       modelPath: options.model.modelName,
+      model:completModel,
     };
     option.schema.model = option.model;
+    option.model.__findOne = async (filter?: any, projection?: any, options?: any, callback?: any): Promise<ModelInstanceSchema> => {
+      const instance: ModelInstanceSchema | null | undefined = await option.model.findOne(filter, projection, options, callback);
+      const result: ModelInstanceSchema = {
+        __createdAt: 0,
+        __key: { _id: '' },
+        populate: async() => {},
+        save: async() => {},
+        remove: async() => {},
+        select:async() => {},
+        _id: '',
+        __parentModel: '',
+        __permission: undefined,
+        __signupId: undefined,
+        __updatedAt: 0,
+        __updatedProperty: [],
+        ...instance,
+        id: instance?.__key._id.toString()||'',
+        __modelPath: option.modelPath,
+        __exist: !!instance,
+      }
+      return result
+    }
+
+
     const EventManager: {
       [p: string]: {
         pre: ListenerPreSchema[];
         post: ListenerPostSchema[];
       };
     } = {};
+
+
 
     const callPre: (e: EventPreSchema) => Promise<void | ResultSchema> = async (
       e: EventPreSchema
@@ -63,12 +107,16 @@ const MakeModelCtlForm: (
       try {
         if (!EventManager[e.ctx.service]?.post) return e.res;
         for (const listener of EventManager[e.ctx.service].post) {
-          if (listener) await listener(e);
+          if (listener){
+            const r = await listener(e);
+            if(r) return r ;
+          }  
         }
         return e.res;
       } catch (error) {
         Log("ERROR_callPost", error);
       }
+      return e.res;
     };
     const ctrlMaker = function () {
       const controller: ModelControllerSchema = {};
@@ -140,7 +188,10 @@ async function formatModelInstance(
   option: ModelFrom_optionSchema & { modelPath: string },
   modelInstance: ModelInstanceSchema
 ) {
-  const info: PopulateSchema = {};
+  const info: PopulateSchema = {
+    populate:[],
+    select:'',
+  };
   deepPopulate(
     ctx,
     service,
@@ -148,9 +199,9 @@ async function formatModelInstance(
     info,
     modelInstance.__key._id.toString() == ctx.__key
   );
-  await modelInstance.populate(info.populate);
-  const propertys = info.select.replaceAll(" ", "").split("-");
-  propertys.forEach((p) => {
+  await modelInstance.populate(info.populate||[]);
+  const propertys = info.select?.replaceAll(" ", "").split("-");
+  propertys?.forEach((p) => {
     modelInstance[p] = undefined;
   });
 }
@@ -161,13 +212,13 @@ function deepPopulate(
   ref: string,
   info: PopulateSchema,
   isOwner: boolean,
-  count?:{
-    count:number,
-    max:number
+  count?: {
+    count: number,
+    max: number
   },
 ) {
-  const description: DescriptionSchema =
-    ModelControllers[ref].option.schema.description;
+  const description: DescriptionSchema|undefined =
+    ModelControllers[ref].option?.schema.description;
   info.populate = [];
   info.select = "";
   for (const p in description) {
@@ -175,21 +226,21 @@ function deepPopulate(
       const rule = description[p];
 
       const exec = (rule: TypeRuleSchema) => {
-        if (rule.deep && !count ) {
+        if (rule.deep && !count) {
           count = {
-            count:0,
-            max:rule.deep as number
+            count: 0,
+            max: rule.deep as number
           }
         }
-        if(count && (count.count < count.max)){
+        if (count && (count.count < count.max)) {
           count.count++;
           const info2 = {
             path: p,
           };
-          info.populate.push(info2);
-          deepPopulate(ctx, service, rule.ref, info2,isOwner , count );
+          info.populate?.push(info2);
+          deepPopulate(ctx, service, rule.ref||'', info2, isOwner, count);
         }
-        
+
       };
       if (!Array.isArray(rule)) {
         if (
@@ -239,19 +290,19 @@ function deepPopulate(
 }
 async function backDestroy(ctx: ContextSchema, more: MoreSchema) {
   const promises: ResponseSchema[] = [];
-  more.savedlist.forEach((saved) => {
-    const p = saved.controller[saved.volatile ? "delete" : "destroy"]({
+  more?.savedlist?.forEach((saved) => {
+    const p = saved?.controller[saved.volatile ? "delete" : "destroy"]?.({
       ...ctx,
       data: {
         id: saved.modelId,
         __key: saved.__key,
       },
     });
-    return promises.push(p);
+    return p?promises.push(p):promises;
   });
   const log = await Promise.allSettled(promises);
   console.log(log);
-  
+
   more.savedlist = [];
   return;
 }
@@ -284,14 +335,14 @@ function parentInfo(parentModel: string): {
 //   const propertyRule = description[in]
 // }
 // function collectRule(){
-  
+
 // }
 
 export {
   MakeModelCtlForm,
   backDestroy,
   FileValidator,
- // InstanceRule,
+  // InstanceRule,
   formatModelInstance,
   parentInfo,
 };

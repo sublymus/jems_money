@@ -11,6 +11,7 @@
     "esModuleInterop": true,
     "target": "ESNext",
     "moduleResolution": "node",
+    "strict": true,
     "outDir": "dist",
     "rootDir": "./",
     "sourceMap": true,

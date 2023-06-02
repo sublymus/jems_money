@@ -12,6 +12,7 @@ import {
   ModelControllers,
   ModelFrom_optionSchema,
   ModelInstanceSchema,
+  Model_optionSchema,
   MoreSchema,
   ResponseSchema,
   ResultSchema,
@@ -20,12 +21,12 @@ import { FileValidator, backDestroy } from "./ModelCtrlManager";
 
 export const createFactory = (
   controller: ModelControllerSchema,
-  option: ModelFrom_optionSchema & { modelPath: string },
+  option: Model_optionSchema,
   callPost: (e: EventPostSchema) => ResponseSchema,
   callPre: (e: EventPreSchema) => Promise<void| ResultSchema>
 ) => {
 
-  return async (ctx: ContextSchema, more: MoreSchema): ResponseSchema => {
+  return async (ctx: ContextSchema, more?: MoreSchema): ResponseSchema => {
     const service = option.volatile ? "create" : "store";
     ctx = { ...ctx };
     ctx.service = service;
@@ -65,8 +66,8 @@ export const createFactory = (
     });
     if(preRes) return preRes
 
-    const accu = {};
-    let modelInstance: ModelInstanceSchema;
+    const accu:MoreSchema = {};
+    let modelInstance: ModelInstanceSchema|null=null;
 
     if (!ctx.__key)
       return callPost({
@@ -140,7 +141,7 @@ export const createFactory = (
                     modelPath: rule.ref,
                   },
                 })
-              ).response;
+              )?.response;
               if (validId) {
                 accu[property] = alienId;
               }
@@ -200,7 +201,7 @@ export const createFactory = (
           //     value: ctx.data[property],
           //     modelPath: option.modelPath,
           // });
-          const res = await (ctrl.create || ctrl.store)(
+          const res = await (ctrl.create || ctrl.store)?.(
             {
               ...ctx,
               data: ctx.data[property],
@@ -217,7 +218,7 @@ export const createFactory = (
                 rule.ref,
             }
           );
-          if (!res) {
+          if (!res?.response) {
             // Log('log', { res, property, value: ctx.data[property], modelPath: option.modelPath })
 
             await backDestroy(ctx, more);
@@ -242,14 +243,6 @@ export const createFactory = (
                   ctx.data[property] +
                   ">",
               },
-            });
-          }
-          if (res.error) {
-            await backDestroy(ctx, more);
-            return await callPost({
-              ctx,
-              more,
-              res,
             });
           }
           accu[property] = res.response;
@@ -300,7 +293,7 @@ export const createFactory = (
                       modelPath: rule[0].ref,
                     },
                   })
-                ).response;
+                )?.response;
                 if (validId) {
                   accu[property][i] = alienId;
                 }
@@ -354,7 +347,7 @@ export const createFactory = (
                 },
               });
             }
-            const res = await (ctrl.create || ctrl.store)(
+            const res = await (ctrl.create || ctrl.store)?.(
               {
                 ...ctx,
                 data: ctx.data[property][i],
@@ -377,21 +370,16 @@ export const createFactory = (
               value: ctx.data[property][i],
               modelPath: option.modelPath,
             });
-            if (!res) {
+            if (!res?.response) {
               await backDestroy(ctx, more);
               //Log('log', { res })
               return await callPost({
                 ctx,
                 more,
-                res,
-              });
-            }
-            if (res.error) {
-              await backDestroy(ctx, more);
-              return await callPost({
-                ctx,
-                more,
-                res,
+                res:{
+                  error:'',
+                  ...await STATUS.NOT_CREATED(ctx),
+                },
               });
             }
             accu[property][i] = res.response;
@@ -412,7 +400,7 @@ export const createFactory = (
                 property: property,
               }
             );
-          } catch (error) {
+          } catch (error:any) {
             await backDestroy(ctx, more);
             return await callPost({
               ctx,
@@ -448,14 +436,16 @@ export const createFactory = (
         ...accu,
         _id: modelId,
       });
-      await modelInstance.save();
+      if(!modelInstance) throw new Error("modelInstance is null");
+      
+      await modelInstance?.save();
       more.savedlist.push({
         modelId,
         __key: ctx.__key,
         volatile: option.volatile,
         controller,
       });
-    } catch (error) {
+    } catch (error:any) {
       //Log('error', error);
       await backDestroy(ctx, more);
       more.modelInstance = modelInstance;

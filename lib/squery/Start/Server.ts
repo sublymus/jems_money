@@ -82,7 +82,7 @@ const server: ControllerSchema = {
         code: "OPERATION_SUCCESS",
         message: "",
       };
-    } catch (error) {
+    } catch (error:any) {
       return {
         error: "OPERATION_FAILED",
         status: 404,
@@ -93,7 +93,7 @@ const server: ControllerSchema = {
   },
   descriptions: async (
     ctx: ContextSchema,
-    more: MoreSchema
+    more?: MoreSchema
   ): ResponseSchema => {
     try {
       const descriptions: {
@@ -102,7 +102,7 @@ const server: ControllerSchema = {
 
       for (const key in ModelControllers) {
         ctx.data.modelPath = key;
-        descriptions[key] = (await server.description(ctx, more)).response;
+        descriptions[key] = (await server.description(ctx, more))?.response;
       }
       return {
         response: descriptions,
@@ -110,7 +110,7 @@ const server: ControllerSchema = {
         code: "OPERATION_SUCCESS",
         message: "",
       };
-    } catch (error) {
+    } catch (error:any) {
       return {
         error: "NOT_FOUND",
         status: 404,
@@ -122,7 +122,7 @@ const server: ControllerSchema = {
   instanceId: async (ctx: ContextSchema): ResponseSchema => {
     const local_modelInstance = await ModelControllers[
       ctx.data.modelPath
-    ].option.model.findOne({
+    ].option?.model.findOne({
       _id: ctx.data.id,
     });
     if (!local_modelInstance) {
@@ -154,7 +154,7 @@ const server: ControllerSchema = {
         };
       }
       throw new Error("ID is not valid");
-    } catch (error) {
+    } catch (error:any) {
       return {
         error: "BAD_ARGUMENT",
         status: 404,
@@ -188,7 +188,7 @@ const server: ControllerSchema = {
       // const isValidArrayProperty = (part: string) => {
       //     return /^[a-zA-Z_][a-zA-Z0-9_]*\[([0-9]{1,4})\]$/.test(part);
       //
-      let res = await ModelControllers[modelPath]().read({
+      let res = await ModelControllers[modelPath]().read?.({
         ...ctx,
         data: { id },
       });
@@ -234,7 +234,7 @@ const server: ControllerSchema = {
             );
 
           const info = parentInfo(currentDoc.__parentModel);
-          res = await ModelControllers[info.parentModelPath]().read({
+          res = await ModelControllers[info.parentModelPath]().read?.({
             ...ctx,
             data: { id: info.parentId },
           });
@@ -282,7 +282,7 @@ const server: ControllerSchema = {
                 " <-- is not a ObjectId property ; ; You must recover his parent  "
             );
           }
-          let res = await ModelControllers[rule.ref]().read({
+          let res = await ModelControllers[rule.ref||'']().read?.({
             ...ctx,
             data: { id: currentDoc[part] },
           });
@@ -301,9 +301,9 @@ const server: ControllerSchema = {
             };
           }
           currentDoc = res.response;
-          currentModelPath = rule.ref;
+          currentModelPath = rule.ref||'';
           currentDescription =
-            ModelControllers[rule.ref].option.schema.description;
+            ModelControllers[rule.ref||''].option.schema.description;
         } else {
           throw new Error(illegalMessage);
         }
@@ -319,7 +319,7 @@ const server: ControllerSchema = {
         code: "OPERATION_SUCCESS",
         message: "OPERATION_SUCCESS",
       };
-    } catch (error) {
+    } catch (error:any) {
       return {
         error: "ILLEGAL_ARGUMENT",
         status: 407,

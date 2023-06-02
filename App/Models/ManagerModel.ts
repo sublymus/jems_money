@@ -47,7 +47,6 @@ export const ManagerModel = mongoose.model("manager", managerSchema);
 const maker = MakeModelCtlForm({
   model: ManagerModel,
   schema: managerSchema,
-  volatile: false,
 });
 maker.tools.assigneToNewListElement({
   parentModelPath: 'entreprise',

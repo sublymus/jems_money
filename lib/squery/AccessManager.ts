@@ -25,7 +25,7 @@ export function accessValidator(option: {
   let { ctx, type, isOwner, property , rule } = option;
   let {access , share } = rule;
   let { service, signup } = ctx;
-  const accessMap = {
+  const accessMap :any= {
     controller: {
       create: {
         public: ["any", "client", "shared", "owner", "admin"],
@@ -90,9 +90,11 @@ export function accessValidator(option: {
   else if (service == "destroy") service = "delete";
 
   if (type == "controller" && access == undefined) access = "public";
-  if (type == "controller" && access == "private") access = "secret";
-  if (type == "property" && access == undefined) access = "default";
-
+  else if (type == "controller" && access == "private") access = "secret";
+  else if (type == "property" && access == undefined) access = "default";
+  else if(access == undefined) access = "default";
+  if (type == "controller" && access == 'default') access = "public";
+  
   let clientPermission = ctx.__permission?.startsWith("client:") ? "client" : (ctx.__permission || 'any');
 
   if (clientPermission == "client") {

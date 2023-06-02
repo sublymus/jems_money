@@ -106,34 +106,9 @@ export const TransactionModel = mongoose.model(
   TransactionSchema
 );
 
-/*
-
-
-const transaction = await SQuery.newInstance('transaction',{id: res.response});
-
-transaction.when('refresh:manager',(manager)=>{
-  notifyJoinManager();
-})
-transaction.when('refresh:status',(status)=>{
-  dispatch(setStatus(status));
-})
-
-INSTANCE.when('refresh:PROPERTY',(PROPERTY_VALUE)=>{
-  // PROPERTY_VALUE
-});
-INSTANCE.when('refresh:PROPERTY',(PROPERTY_VALUE)=>{
-  // PROPERTY_VALUE
-});
-
-
-*/
-
-//createAsyncThunk
-
 const maker = MakeModelCtlForm({
   model: TransactionModel,
   schema: TransactionSchema,
-  volatile: false,
 });
 
 export default TransactionModel;

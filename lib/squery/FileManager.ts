@@ -47,10 +47,11 @@ export async function FileValidator(
     property: string;
   }
 ): Promise<string[]> {
+  rule.file = rule.file||{};
   if (["create", "store", "update"].includes(service)) {
     //console.log(files);
 
-    if (!files) return;
+    if (!files) return [];
     rule.file.type = rule.file.type || ["*/*"];
     rule.file.type = rule.file.type.length == 0 ? ["*/*"] : rule.file.type;
     rule.file.size = rule.file.size || 2_000_000;
@@ -113,7 +114,7 @@ export async function FileValidator(
       }
     }
   }
-  const ruleFileDir = path.join(...rule.file.dir);
+  const ruleFileDir = path.join(...rule.file.dir||[]);
   Log("ruleFileDir", { ruleFileDir });
   await new Promise((res, rej) => {
     if (!fs.existsSync(ruleFileDir)) {
@@ -159,10 +160,10 @@ export async function FileValidator(
                 ...instanceData,
                 createdAt: Date.now(),
               },
-              Config.conf.URL_KEY
+              Config.conf.URL_KEY||''
             ) + path.substring(path.lastIndexOf("."));
           let p =
-            rule.file.dir.filter((p, i) => i > 0).join("/") + "/" + dataPath;
+            (rule.file?.dir||[]).filter((p, i) => i > 0).join("/") + "/" + dataPath;
           p = p.startsWith("/") ? p : "/" + p;
           Log("path**", p);
           paths.push(p);
@@ -172,6 +173,9 @@ export async function FileValidator(
       return paths;
     },
     read: async () => {
+      return dataPaths;
+    },
+    list: async () => {
       return dataPaths;
     },
     update: async () => {
@@ -197,10 +201,10 @@ export async function FileValidator(
                 ...instanceData,
                 createdAt: Date.now(),
               },
-              Config.conf.URL_KEY
+              Config.conf.URL_KEY||''
             ) + path.substring(path.lastIndexOf("."));
           let p =
-            rule.file.dir.filter((p, i) => i > 0).join("/") + "/" + dataPath;
+           ( rule.file?.dir||[]).filter((p, i) => i > 0).join("/") + "/" + dataPath;
           p = p.startsWith("/") ? p : "/" + p;
           Log("path**", p);
           paths.push(p);
@@ -215,7 +219,7 @@ export async function FileValidator(
           Log("onUpdateData", dataPath);
           const urlData: UrlDataType = jwt.verify(
             dataPath,
-            Config.conf.URL_KEY
+            Config.conf.URL_KEY||''
           ) as UrlDataType;
           const actualPath = urlData?.realPath;
           if (!actualPath) return;
@@ -240,7 +244,7 @@ export async function FileValidator(
         Log("onDeleteData", dataPath);
         const urlData: UrlDataType = jwt.verify(
           dataPath,
-          Config.conf.URL_KEY
+          Config.conf.URL_KEY||''
         ) as UrlDataType;
         const actualPath = urlData.realPath;
         if (!actualPath) return;

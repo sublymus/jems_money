@@ -20,7 +20,6 @@ export const UserPreferenceModel = mongoose.model("userpreference", UserPreferen
 const maker = MakeModelCtlForm({
   model: UserPreferenceModel,
   schema: UserPreferenceSchema,
-  volatile: false,
 });
 
 

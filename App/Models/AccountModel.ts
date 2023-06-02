@@ -34,7 +34,7 @@ let AccountSchema = SQuery.Schema({
     imgProfile: [{
         type: String,
         file: {
-            size: [1, 1e10],
+            size: [1, 1e8],
             length: [0, 4],
             dir: [Config.conf.rootDir,'fs'],
         }
@@ -46,6 +46,5 @@ const AccountModel = mongoose.model("account", AccountSchema);
 MakeModelCtlForm({
     schema: AccountSchema,
     model: AccountModel,
-    volatile: false,
 });
 export default AccountModel;

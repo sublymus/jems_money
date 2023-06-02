@@ -73,7 +73,7 @@ export const SQuery_Schema = (description: DescriptionSchema , options?:SchemaOp
       //console.log(doc.__updatedProperty, canEmit);
       if (!canEmit) return;
   
-      Global.io.emit("update:" + doc._id.toString(), {
+      Global.io?.emit("update:" + doc._id.toString(), {
         id: doc._id.toString(),
         doc,
         properties: doc.__updatedProperty,

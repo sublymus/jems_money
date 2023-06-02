@@ -31,19 +31,19 @@ type MainType = (
   socket: Socket
 ) => (
   ctrlName: string,
-  service: string
+  service: AllowedModelService
 ) => (data: DataSchema, cb?: CallBack) => Promise<void>;
 type GlobalSchema = {
-  io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>;
+  io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>|null;
 };
 type SQuerySchema = ((
-  socket: Socket
+  socket: Socket|null
 ) => (
   ctrlName: string,
-  service: string
+  service: AllowedModelService
 ) => (data: DataSchema, cb?: CallBack) => Promise<void>) & {
   emiter: EventEmiter;
-  io: (server?: any) => Server;
+  io: (server?: any) => Server|null;
   Schema: (description: DescriptionSchema , options?:SchemaOptions<FlatRecord<any>, {}, {}, {}, {}> | ResolveSchemaOptions<{}>) => SQueryMongooseSchema;
   auth: (authData: authDataOptionSchema) => void;
   files: {
@@ -51,14 +51,15 @@ type SQuerySchema = ((
   };
   service: (
     ctrlName: string,
-    service: string,
+    service: AllowedModelService,
     data: DataSchema,
     ctx: ContextSchema
   ) => Promise<any>;
-  cookies(socket: Socket, key?: string, value?: any): Promise<any>;
+  cookies(socket: Socket|null|undefined|string, key?: string, value?: any): Promise<any>;
 };
 export const MapUserCtx: MapUserCtxSchema = {};
-export const modelServiceEnabled = [
+export type AllowedModelService = 'create'|'read'|'list'|'update'|'delete';
+export const modelServiceEnabled:AllowedModelService[] = [
   "create",
   "read",
   "list",
@@ -94,7 +95,7 @@ export async function defineContext(
     __permission: token?.__permission || "any", ///  data.__permission = undefined
   };
   MapUserCtx[token?.__key] = {
-    ctx: ctx.socket.id,
+    ctx: ctx.socket?.id,
     exp: decoded.exp,
     isAvalaibleCtx: true,
   };
@@ -102,10 +103,10 @@ export async function defineContext(
 }
 
 const main: MainType = function (socket: Socket) {
-  return (ctrlName: string, service: string) => {
+  return (ctrlName: string, service: AllowedModelService) => {
     return async (data: DataSchema, cb?: CallBack) => {
       data = data || {};
-      Log("squery:data", data, { ctrlName }, { service });
+      Log("squery:data", {data}, { ctrlName }, { service });
 
       const ctx: ContextSchema = await defineContext(
         socket,
@@ -113,7 +114,7 @@ const main: MainType = function (socket: Socket) {
         service,
         data
       );
-
+        Log('Cookie_result',await SQuery.cookies(socket.request.headers.cookie ,'' , 'token'));
       const midList = [...GlobalMiddlewares];
 
       for (let i = 0; i < midList.length; i++) {
@@ -121,10 +122,9 @@ const main: MainType = function (socket: Socket) {
 
         if (res !== undefined) return cb?.(res);
       }
-      let res: ResultSchema = null;
+      let res: ResultSchema|undefined;
       let modelRequest =
-        !!ModelControllers[ctrlName]?.()[service] &&
-         modelServiceEnabled.includes(service);
+        !!ModelControllers[ctrlName]?.()?.[service] && modelServiceEnabled.includes(service);
       try {
         if (modelRequest) {
           res = await ModelControllers[ctrlName]?.()[service]?.(ctx);

@@ -2,11 +2,11 @@ import Log from "sublymus_logger";
 import { accessValidator } from "./AccessManager";
 import { ContextSchema } from "./Context";
 import STATUS from "./Errors/STATUS";
-import { Controllers, DescriptionSchema, EventPostSchema, EventPreSchema, ModelControllerSchema, ModelControllers, ModelFrom_optionSchema, ModelInstanceSchema, MoreSchema, ResponseSchema, ResultSchema } from "./Initialize";
+import { Controllers, DescriptionSchema, EventPostSchema, EventPreSchema, ModelControllerSchema, ModelControllers, ModelFrom_optionSchema, ModelInstanceSchema, Model_optionSchema, MoreSchema, ResponseSchema, ResultSchema } from "./Initialize";
 import { FileValidator } from "./FileManager";
 
-export const updateFactory = (controller: ModelControllerSchema, option: ModelFrom_optionSchema & { modelPath: string }, callPost: (e: EventPostSchema) => ResponseSchema, callPre: (e: EventPreSchema) => Promise<void | ResultSchema>) => {
-  return async (ctx: ContextSchema, more: MoreSchema): ResponseSchema => {
+export const updateFactory = (controller: ModelControllerSchema, option: Model_optionSchema, callPost: (e: EventPostSchema) => ResponseSchema, callPre: (e: EventPreSchema) => Promise<void | ResultSchema>) => {
+  return async (ctx: ContextSchema, more?: MoreSchema): ResponseSchema => {
     const service = "update";
     ctx = { ...ctx };
     ctx.service = service;
@@ -42,7 +42,7 @@ export const updateFactory = (controller: ModelControllerSchema, option: ModelFr
     const description: DescriptionSchema = option.schema.description;
 
     try {
-      modelInstance = await option.model.findOne({
+      modelInstance = await option.model.__findOne({
         _id: ctx.data.id,
       });
       if (!modelInstance) {
@@ -101,7 +101,7 @@ export const updateFactory = (controller: ModelControllerSchema, option: ModelFr
                     id: alienId,
                     modelPath: rule.ref,
                   }
-                })).response
+                }))?.response
                 if (validId) {
                   modelInstance[p] = alienId;
                 }
@@ -115,14 +115,14 @@ export const updateFactory = (controller: ModelControllerSchema, option: ModelFr
                 [p]:ctx.data[p]
               })
               try {const ctrl = ModelControllers[rule.ref]();
-                const res =( await (ctrl.create || ctrl.store)({
+                const res =( await (ctrl.create || ctrl.store)?.({
                   ...ctx,
                   data: {
                     ...ctx.data[p]
                   }
                 }))
                 Log("erty",res)
-                if (res.response) {
+                if (!(!res?.response)) {
                   modelInstance[p] = res.response;
                 }
               } catch (error) {
@@ -136,11 +136,11 @@ export const updateFactory = (controller: ModelControllerSchema, option: ModelFr
              if(!oldId) continue;
 
               const impact = rule.impact != false;
-              let res: ResultSchema;
+              let res: ResultSchema|undefined;
               Log("impact", { impact, rule });
               if (impact) {
                 const ctrl = ModelControllers[rule.ref]();
-                res = await (ctrl.delete || ctrl.destroy)(
+                res = await (ctrl.delete || ctrl.destroy)?.(
                   {
                     ...ctx,
                     data: { id: oldId },
@@ -178,7 +178,7 @@ export const updateFactory = (controller: ModelControllerSchema, option: ModelFr
                     property: p
                   }
                 );
-              } catch (error) {
+              } catch (error:any) {
                 return await callPost({
                   ctx,
                   more,
@@ -215,7 +215,7 @@ export const updateFactory = (controller: ModelControllerSchema, option: ModelFr
           }
         }
       }
-    } catch (error) {
+    } catch (error:any) {
       return await callPost({
         ctx,
         more,
@@ -231,7 +231,7 @@ export const updateFactory = (controller: ModelControllerSchema, option: ModelFr
 
     try {
       await modelInstance.save();
-    } catch (error) {
+    } catch (error:any) {
       return await callPost({
         ctx,
         more,
@@ -250,13 +250,13 @@ export const updateFactory = (controller: ModelControllerSchema, option: ModelFr
       more,
       res: {
         response: (
-          await controller.read({
+          await controller.read?.({
             ...ctx,
             data: {
               id: modelInstance._id.toString(),
             },
           })
-        ).response,
+        )?.response,
         ...(await STATUS.OPERATION_SUCCESS(ctx, {
           target: option.modelPath.toLocaleUpperCase(),
         })),

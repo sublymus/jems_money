@@ -3,14 +3,15 @@ import path from "node:path";
 import { Config } from "./Config";
 const relativeDir = __dirname.replace(Config.conf.rootDir, "");
 const systemDir = [path.join(relativeDir, "Start")];
+const excDir = Config.conf.execDir||[];
 [
   ...systemDir,
-  ...Config.conf.execDir.map((link) => {
+  ...excDir.map((link) => {
     return path.join(...link.split("/"));
   }),
 ].forEach(exec);
 
-Config.conf.execDir.map((link) => {
+excDir.map((link) => {
   console.log({ link });
   return path.join(...link.split("/"));
 });

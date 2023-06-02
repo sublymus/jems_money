@@ -43,14 +43,6 @@ const EntrepriseSchema = SQuery.Schema({
       ref: CountryModel.modelName,
     },
   ],
-  // openedDiscussion: [
-  //   {
-  //     type: Schema.Types.ObjectId,
-  //     ref: DiscussionModel.modelName,
-  //     impact: false,
-  //     strictAlien: true,
-  //   },
-  // ],
 });
 
 export const EntrepriseModel = mongoose.model("entreprise", EntrepriseSchema);
@@ -60,7 +52,7 @@ const maker = MakeModelCtlForm({
   schema: EntrepriseSchema,
   volatile: true,
 }).pre("create", async () => {
-  const etp = await ModelControllers["entreprise"].option.model.findOne();
+  const etp = await ModelControllers["entreprise"].option?.model.findOne();
   if (etp) {
     return {
       response: etp._id.toString(),

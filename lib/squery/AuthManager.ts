@@ -28,9 +28,9 @@ export class AuthManager {
       });
       loginModelInstance = await ModelControllers[
         authData.login
-      ].option.model.findOne(filter);
+      ].option?.model.findOne(filter);
       Log("loginModelInstance", loginModelInstance);
-    } catch (error) {
+    } catch (error:any) {
       Log("ERROR_loginModelInstance", error);
       //  console.log('ERROR_loginModelInstance', error);
       return {
@@ -103,7 +103,7 @@ export class AuthManager {
           throw new Error(ext.error());
         }
       }
-    } catch (error) {
+    } catch (error:any) {
       return {
         error: "OPERATION FAILED",
         ...(await STATUS.OPERATION_FAILED(ctx, {
@@ -114,14 +114,14 @@ export class AuthManager {
     }
     const more: any = {};
     const ctrl =  ModelControllers[authData.signup]();
-    const res =  await (ctrl.create || ctrl.store)(ctx, more);
+    const res =  await (ctrl.create || ctrl.store)?.(ctx, more);
     Log("ici", res);
-    if (res.error) {
+    if (!res?.response) {
       return {
         error: "OPERATION_FAILED",
         ...(await STATUS.OPERATION_FAILED(ctx, {
           target: authData.signup.toLocaleUpperCase(),
-          message: res.error,
+          message: res?.error,
         })),
       };
     }

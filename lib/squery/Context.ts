@@ -29,7 +29,7 @@ export type ContextSchema = {
   ctrlName: string,
   service: string,
   data: DataSchema,
-  socket: Socket,
+  socket: Socket|null,
   signup:{
     modelPath:string,
     id:string

@@ -10,7 +10,6 @@ export const ManagerPreferenceModel = mongoose.model("managerpreference", Manage
 const maker = MakeModelCtlForm({
   model: ManagerPreferenceModel,
   schema: ManagerPreferenceSchema,
-  volatile: false,
 });
 
 export default ManagerPreferenceModel;

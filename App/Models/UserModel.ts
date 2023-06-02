@@ -35,7 +35,6 @@ const UserModel = mongoose.model("user", userSchema);
 const maker = MakeModelCtlForm({
   model: UserModel,
   schema: userSchema,
-  volatile: false,
 });
 
 export default UserModel;

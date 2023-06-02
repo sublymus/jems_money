@@ -15,7 +15,7 @@ const Transaction: ControllerSchema = {
 
     const client = await ModelControllers[
       ctx.signup.modelPath
-    ]?.option.model.findOne({
+    ]?.option?.model.findOne({
       _id: ctx.signup.id,
     });
 
@@ -37,7 +37,7 @@ const Transaction: ControllerSchema = {
 
       const transaction = await ModelControllers[
         "transaction"
-      ]?.option.model.findOne({
+      ]?.option?.model.findOne({
         _id: element,
       });
       console.log(
@@ -82,7 +82,7 @@ const Transaction: ControllerSchema = {
     //     status: 200,
     //   };
     // }
-    const etp = await ModelControllers["entreprise"]?.option.model.findOne();
+    const etp = await ModelControllers["entreprise"]?.option?.model.findOne();
     Log("etp", { etp });
 
     if (!etp) {
@@ -93,7 +93,7 @@ const Transaction: ControllerSchema = {
         status: 404,
       };
     }
-    const resT = await ModelControllers["transaction"]()["list"]({
+    const resT = await ModelControllers["transaction"]()["list"]?.({
       ...ctx,
       __permission: "admin",
       __key: ctx.__key,
@@ -114,8 +114,8 @@ const Transaction: ControllerSchema = {
       },
     });
     Log("resT", { resT });
-    if (resT.error) return resT;
-    const resET = await ModelControllers["transaction"]()["list"]({
+    if (!resT?.response) return resT;
+    const resET = await ModelControllers["transaction"]()["list"]?.({
       ...ctx,
       __permission: "admin",
       __key: etp.__key.toString(),
@@ -130,7 +130,7 @@ const Transaction: ControllerSchema = {
     });
 
     Log("resET", { resET });
-    if (resET.error) return resET;
+    if (!resET?.response) return resET;
 
     return {
       code: "OPERATION_SUCCESS",
@@ -144,7 +144,7 @@ const Transaction: ControllerSchema = {
     const lastVal = "start",
       newVal = "full";
 
-    const res = await ModelControllers["transaction"]()["update"]({
+    const res = await ModelControllers["transaction"]()["update"]?.({
       ...ctx,
       __permission: "admin",
       service: "update",
@@ -181,11 +181,11 @@ const Transaction: ControllerSchema = {
       // }
     });
 
-    if (res.error) return res;
+    if (!res?.response) return res;
 
     const transaction = await ModelControllers[
       "transaction"
-    ]?.option.model.findOne({
+    ]?.option?.model.findOne({
       _id: ctx.data.id,
     });
     console.log("🚀 ~ file: Transaction.ts:162 ~ full: ~ ctx.data:", ctx.data);
@@ -263,7 +263,7 @@ const Transaction: ControllerSchema = {
         status: 404,
       };
     }
-    const res2 = await ModelControllers["transaction"]()["update"]({
+    const res2 = await ModelControllers["transaction"]()["update"]?.({
       ...ctx,
       __permission: "admin",
       service: "update",
@@ -272,7 +272,7 @@ const Transaction: ControllerSchema = {
         status: transaction.manager ? "run" : newVal,
       },
     });
-    if (res2.error) return res2;
+    if (!res2?.error) return res2;
     return {
       code: "OPERATION_SUCCESS",
       message: "OPERATION_SUCCESS",
@@ -289,7 +289,7 @@ const Transaction: ControllerSchema = {
         status: 404,
       };
     }
-    const manager = await ModelControllers["manager"]?.option.model.findOne({
+    const manager = await ModelControllers["manager"]?.option?.model.findOne({
       _id: ctx.signup.id,
     });
     Log("manager", { manager });
@@ -313,7 +313,7 @@ const Transaction: ControllerSchema = {
           status: 404,
         };
       }
-      const manager = await ModelControllers["manager"]?.option.model.findOne({
+      const manager = await ModelControllers["manager"]?.option?.model.findOne({
         _id: ctx.signup.id,
       });
       Log("manager", { manager });
@@ -327,7 +327,7 @@ const Transaction: ControllerSchema = {
       }
       const transaction: ModelInstanceSchema = await ModelControllers[
         "transaction"
-      ]?.option.model.findOne({ _id: ctx.data.id });
+      ]?.option?.model.__findOne({ _id: ctx.data.id });
       Log("transaction", { transaction });
       if (!transaction) {
         return {
@@ -350,7 +350,7 @@ const Transaction: ControllerSchema = {
       await transaction.save();
 
       if (transaction.discussion) {
-        const res = await ModelControllers["discussion"]()["update"]({
+        const res = await ModelControllers["discussion"]()["update"]?.({
           ...ctx,
           __permission: "admin",
           service: "update",
@@ -362,7 +362,7 @@ const Transaction: ControllerSchema = {
         Log("resDisc", res);
       }
 
-      const etp = await ModelControllers["entreprise"]?.option.model.findOne();
+      const etp = await ModelControllers["entreprise"]?.option?.model.findOne();
       Log("etp", { etp });
 
       if (!etp) {
@@ -373,7 +373,7 @@ const Transaction: ControllerSchema = {
           status: 404,
         };
       }
-      const resET = await ModelControllers["transaction"]()["list"]({
+      const resET = await ModelControllers["transaction"]()["list"]?.({
         ...ctx,
         __permission: "admin",
         __key: etp.__key.toString(),
@@ -387,9 +387,9 @@ const Transaction: ControllerSchema = {
         },
       });
       Log("resET", resET);
-      if (resET.error) return resET;
+      if (!resET?.response) return resET;
 
-      const resListCM = await ModelControllers["transaction"]()["list"]({
+      const resListCM = await ModelControllers["transaction"]()["list"]?.({
         ...ctx,
         __permission: "admin",
         __key: ctx.__key,
@@ -403,14 +403,14 @@ const Transaction: ControllerSchema = {
         },
       });
       Log("resListCM", resListCM);
-      if (resListCM.error) return resListCM;
+      if (!resListCM?.response) return resListCM;
       return {
         code: "OPERATION_SUCCESS",
         message: "OPERATION_SUCCESS",
         response: ctx.data.id,
         status: 200,
       };
-    } catch (error) {
+    } catch (error:any) {
       return {
         error: "SERVER_ERROR",
         code: "SERVER_ERROR",
@@ -431,7 +431,7 @@ const Transaction: ControllerSchema = {
           status: 404,
         };
       }
-      const manager = await ModelControllers["manager"]?.option.model.findOne({
+      const manager = await ModelControllers["manager"]?.option?.model.findOne({
         _id: ctx.signup.id,
       });
       Log("manager", { manager });
@@ -445,7 +445,7 @@ const Transaction: ControllerSchema = {
       }
       const transaction = await ModelControllers[
         "transaction"
-      ]?.option.model.findOne({
+      ]?.option?.model.findOne({
         _id: ctx.data.id,
       });
       if (!transaction) {
@@ -464,7 +464,7 @@ const Transaction: ControllerSchema = {
           status: 404,
         };
       }
-      const res = await ModelControllers["transaction"]()["update"]({
+      const res = await ModelControllers["transaction"]()["update"]?.({
         ...ctx,
         __permission: "admin",
         service: "update",
@@ -475,7 +475,7 @@ const Transaction: ControllerSchema = {
         },
       });
       return res;
-    } catch (error) {
+    } catch (error:any) {
       return {
         error: "SERVER_ERROR",
         code: "SERVER_ERROR",
@@ -488,7 +488,7 @@ const Transaction: ControllerSchema = {
     try {
       const transaction = await ModelControllers[
         "transaction"
-      ]?.option.model.findOne({
+      ]?.option?.model.findOne({
         _id: ctx.data.id,
       });
       if (!transaction) {
@@ -517,7 +517,7 @@ const Transaction: ControllerSchema = {
           status: 200,
         };
       }
-      const res = await ModelControllers["transaction"]()["update"]({
+      const res = await ModelControllers["transaction"]()["update"]?.({
         ...ctx,
         __permission: "admin",
         __key: transaction.__key.toString(),
@@ -531,9 +531,9 @@ const Transaction: ControllerSchema = {
           managerFile: ctx.data.managerFile,
         },
       });
-      Log("res", res.response);
+      Log("res", res?.response);
       return res;
-    } catch (error) {
+    } catch (error:any) {
       return {
         error: "SERVER_ERROR",
         code: "SERVER_ERROR",
@@ -551,7 +551,7 @@ async function updateTransaction(
 ) {
   const transaction = await ModelControllers[
     "transaction"
-  ]?.option.model.findOne({
+  ]?.option?.model.findOne({
     _id: ctx.data.id,
   });
   if (!transaction) {
@@ -570,7 +570,7 @@ async function updateTransaction(
       status: 404,
     };
   }
-  const res = await ModelControllers["transaction"]()["update"]({
+  const res = await ModelControllers["transaction"]()["update"]?.({
     ...ctx,
     __permission: "admin",
     service: "update",

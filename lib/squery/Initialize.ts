@@ -1,5 +1,5 @@
 import './execAuto'
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Callback, FilterQuery, ProjectionType, QueryOptions, QueryWithHelpers, Schema } from 'mongoose';
 import { ContextSchema } from "./Context";
 import EventEmiter from './event/eventEmiter';
 export type StatusSchema = {
@@ -24,12 +24,18 @@ export type successCaseSchema = {
   error?: any;
 };
 export type ResultSchema = (successCaseSchema | ErrorCaseSchema) & StatusSchema;
-export type ResponseSchema = Promise<ResultSchema>;
+export type ResponseSchema = Promise<ResultSchema|undefined>;
 
 export type MiddlewareSchema = (context: ContextSchema) => ResponseSchema | Promise<void | undefined>;
 
 export type GlobalMiddlewareSchema = MiddlewareSchema[];
 
+export type savedSchema = {
+  modelId: string;
+  __key: string;
+  volatile: boolean;
+  controller: ModelControllerSchema;
+};
 export type MoreSchema = {
   [p: string]: any;
   savedlist?: savedSchema[];
@@ -86,13 +92,13 @@ export type ListenerPreSchema = (e: EventPreSchema) => Promise<void | ResultSche
 export type ListenerPostSchema = (e: EventPostSchema) => Promise<void | ResultSchema>;
 
 export type ModelControllerConfigSchema = {
-  option?: ModelFrom_optionSchema;
+  option: Model_optionSchema;
   pre: (service: ModelServiceAvailable, listener: ListenerPreSchema) => CtrlModelMakerSchema;
   post: (service: ModelServiceAvailable, listener: ListenerPostSchema) => CtrlModelMakerSchema;
   tools:ToolsInterface & {maker:CtrlModelMakerSchema},
 }
 export type ControllerConfigSchema = {
-  option?: SaveCtrlOptionSchema;
+  option: SaveCtrlOptionSchema;
   tools:ToolsInterface & { maker: CtrlMakerSchema }
   pre: (service: string, listener: ListenerPreSchema) => CtrlMakerSchema;
   post: (service: string, listener: ListenerPostSchema) => CtrlMakerSchema;
@@ -130,8 +136,8 @@ export type bindData = {
 }
 export type ModelFrom_optionSchema = {
   schema: SQueryMongooseSchema;
-  model:  mongoose.Model<any, unknown, unknown, unknown, any> & {paginate?:(...arg:any[])=>any};
-  volatile: boolean;
+  model:  mongoose.Model<any, unknown, unknown, unknown, any> & {paginate?:(...arg:any[])=>any };
+  volatile?: boolean;
   access?: ControllerAccesSchema;
   bind?: bindData[],
   query?: {
@@ -141,12 +147,8 @@ export type ModelFrom_optionSchema = {
   }
 };
 
-export type savedSchema = {
-  modelId: string;
-  __key: string;
-  volatile: boolean;
-  controller: ModelControllerSchema;
-};
+export type  Model_optionSchema =  ModelFrom_optionSchema & {volatile:boolean, modelPath: string ,model:&{__findOne: (filter?: any, projection?: any, options?: any, callback?: any)=>Promise<ModelInstanceSchema> }}
+
 export type FilterSchema = {
   [p: string]: any;
 };
@@ -168,13 +170,16 @@ export type ModelInstanceSchema = {
   [p: string]: any;
   populate: (info: PopulateAllSchema | PopulateSchema) => Promise<void>;
   save: () => Promise<void>;
-  remove: () => Promise<void>;
+  remove: () => Promise<void>; 
+  __modelPath:string,
+  id:string;
+  __exist:boolean,
   __key: {
     _id: {
       toString: () => string;
     };
   };
-  _id?: {
+  _id: {
     toString: () => string;
   };
   __parentModel:string,
@@ -190,7 +195,7 @@ export interface ModelToolsInterface{
 
 }
 export interface ToolsInterface{
-  [key:string]:(this:{maker:CtrlModelMakerSchema},data: unknown) => void
+  [key:string]:(this:{maker:CtrlModelMakerSchema|CtrlMakerSchema},data: unknown) => void
 }
 export const Tools : ToolsInterface = {} as ToolsInterface
 export const GlobalMiddlewares: GlobalMiddlewareSchema = [];

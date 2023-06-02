@@ -33,7 +33,6 @@ const CountryModel = mongoose.model("country", CountrySchema);
 MakeModelCtlForm({
   schema: CountrySchema,
   model: CountryModel,
-  volatile: false,
 });
 
 export default CountryModel;

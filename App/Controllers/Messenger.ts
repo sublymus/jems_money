@@ -1,24 +1,52 @@
 import Log from "sublymus_logger";
 import { ContextSchema } from "../../lib/squery/Context";
 import { CtrlManager } from "../../lib/squery/CtrlManager";
-import { ControllerSchema, Controllers, ModelControllers, ResponseSchema } from "../../lib/squery/Initialize";
+import { ControllerSchema, Controllers, ModelControllers, ModelInstanceSchema, ResponseSchema, ResultSchema } from "../../lib/squery/Initialize";
 import { Global, SQuery } from "../../lib/squery/SQuery";
+import UserModel from "../Models/UserModel";
+import { UNDIFINED_RESULT } from "../../lib/squery/ModelCtrlManager";
 Log('Messenger','Messenger');
+type  Breaker = (ctx:ContextSchema,instance:ModelInstanceSchema|null|undefined,value?:any,[errorMessage,successMessage]?:[string,string])=>boolean;
+type UNDEFINED = null|undefined;
+const BREAKER_NOT_FOUND :Breaker = (ctx:ContextSchema,instance:ModelInstanceSchema|null|undefined):instance is UNDEFINED=>{
+    let err : ResultSchema|undefined;
+    if(!instance){
+        err ={
+            error: 'NOT_FOUND',
+            //debug:'',
+            code:'NOT_FOUND',
+            status:404,
+            message:`Model don't exist`,
+        } 
+    }else if(!instance?.__exist){
+        err ={
+            error: 'NOT_FOUND',
+            //debug:'',
+            code:'NOT_FOUND',
+            status:404,
+            message:`${instance.__modelPath} don't exist`,
+        } 
+    }
+    if(err){
+        const e = new Error(JSON.stringify(err))
+        throw e;
+    }
+    return false;
+}
+
 const Messenger: ControllerSchema = {
     createDiscussion: async (ctx: ContextSchema): ResponseSchema => {
         const {}=ctx.data;
         try {
-            const client = await ModelControllers[ctx.signup.modelPath].option.model.findOne({ _id: ctx.signup.id });
+            
+            const client:ModelInstanceSchema|null = await ModelControllers[ctx.signup.modelPath].option?.model.__findOne({ 
+                _id: ctx.signup.id ,
+
+                
+            });
             Log('client', {client})
-            if (!client) {
-                return {
-                    error: "NOT_FOUND",
-                    code: "NOT_FOUND",
-                    message: "Client don't exist",
-                    status: 404
-                }
-            }
-            const messenger = await ModelControllers['messenger'].option.model.findOne({ _id: client.messenger });
+            if (BREAKER_NOT_FOUND(ctx,client))return
+            const messenger = await ModelControllers['messenger'].option?.model.findOne({ _id: client.messenger });
             Log('messenger', {messenger})
             if (messenger.opened.length > 0) {
                 return {
@@ -29,21 +57,14 @@ const Messenger: ControllerSchema = {
                 }
             }
            
-            const etp = await ModelControllers['entreprise'].option.model.findOne();
+            const etp = await ModelControllers['entreprise'].option?.model.findOne();
             Log('entreprise', {etp});
-            if (!etp) {
-                return {
-                    error: "Messenger_createDiscussion",
-                    code: "NOT_FOUND",
-                    message: "entreprise don't exist",
-                    status: 404
-                }
-            }
+            if (BREAKER_NOT_FOUND(ctx,etp))return
          
-            const reslistuser = await ModelControllers['discussion']()['list']({
+            const reslistuser = await ModelControllers['discussion']()['list']?.({
                 ...ctx,
                 service: 'list',
-                __key:client.__key,
+                __key:client.__key._id.toString(),
                 data: {
                     addNew: [{
                             client: ctx.login.id,
@@ -57,9 +78,9 @@ const Messenger: ControllerSchema = {
                 }
             });
             Log('reslistuser', {reslistuser});
-            if (reslistuser.error) return reslistuser;
+            if (!reslistuser?.response) return reslistuser;
             const discussionId = reslistuser.response.added;
-            const reslist = await ModelControllers['discussion']()['list']({
+            const reslist = await ModelControllers['discussion']()['list']?.({
                 ...ctx,
                 service: 'list',
                 __key:etp.__key,
@@ -73,7 +94,7 @@ const Messenger: ControllerSchema = {
                 }
             });
             Log('reslist', {reslist});
-            if (reslist.error) return reslist;
+            if (!reslist?.response) return reslist;
             Log('allok', 'ok');
             return {
                 code: "OPERATION_SUCCESS",
@@ -102,7 +123,7 @@ const Messenger: ControllerSchema = {
                     status: 404
                 }
             }
-            const manager = await ModelControllers['manager'].option.model.findOne({ _id: ctx.signup.id });
+            const manager = await ModelControllers['manager'].option?.model.findOne({ _id: ctx.signup.id });
             Log('manager', {manager});
             if (!manager) {
                 return {
@@ -112,16 +133,9 @@ const Messenger: ControllerSchema = {
                     status: 404
                 }
             }
-            const discussion = await ModelControllers['discussion'].option.model.findOne({ _id: discussionId });
+            const discussion = await ModelControllers['discussion'].option?.model.findOne({ _id: discussionId });
             Log('discussion', {discussion});
-            if (!discussion) {
-                return {
-                    error: "NOT_FOUND",
-                    code: "NOT_FOUND",
-                    message: "discussion not found",
-                    status: 404
-                }
-            }
+            if (BREAKER_NOT_FOUND(ctx,discussion))return
             if (discussion.manager) {
                 return {
                     error: "NOT_FOUND",
@@ -133,7 +147,7 @@ const Messenger: ControllerSchema = {
             discussion.manager = ctx.login.id;
             await discussion.save();
             Log('discussionSave', {discussion});
-            const resList= await ModelControllers['discussion']()['list']({
+            const resList= await ModelControllers['discussion']()['list']?.({
                 ...ctx,
                 service: 'list',
                 __key:manager.__key,
@@ -147,9 +161,9 @@ const Messenger: ControllerSchema = {
                 }
             });
             
-            if(resList.error) return resList;
+            if(!resList?.response) return resList;
 
-            const etp = await ModelControllers['entreprise'].option.model.findOne();
+            const etp = await ModelControllers['entreprise'].option?.model.findOne();
             Log('entreprise', {etp});
             if (!etp) {
                 return {
@@ -159,7 +173,7 @@ const Messenger: ControllerSchema = {
                     status: 404
                 }
             }
-            const resList2 = await ModelControllers['discussion']()['list']({
+            const resList2 = await ModelControllers['discussion']()['list']?.({
                 ...ctx,
                 service: 'list',
                 __key:etp.__key,
@@ -172,7 +186,7 @@ const Messenger: ControllerSchema = {
                     }
                 }
             });
-            if(resList2.error) return resList2;
+            if(!resList2?.response) return resList2;
             Log('AllOk', 'ok');
             return {
                 code: "OPERATION_SUCCESS",
@@ -201,7 +215,7 @@ const Messenger: ControllerSchema = {
                     status: 404
                 }
             }
-            const discussion = await ModelControllers['discussion'].option.model.findOne({ _id: discussionId });
+            const discussion = await ModelControllers['discussion'].option?.model.findOne({ _id: discussionId });
             Log('discussion', {discussion});
             if (!discussion) {
                 return {
@@ -219,7 +233,7 @@ const Messenger: ControllerSchema = {
                     status: 404
                 }
             }
-            const userAccount = await ModelControllers['account'].option.model.findOne({ _id: discussion.user });
+            const userAccount = await ModelControllers['account'].option?.model.findOne({ _id: discussion.user });
             Log('userAccount', {userAccount});
             if (!userAccount) {
                 return {
@@ -229,7 +243,7 @@ const Messenger: ControllerSchema = {
                     status: 404
                 }
             }
-            const user = await ModelControllers['user'].option.model.findOne({ __key: userAccount.__key });
+            const user = await ModelControllers['user'].option?.model.findOne({ __key: userAccount.__key });
             Log('user', {user});
             if (!userAccount) {
                 return {
@@ -240,7 +254,7 @@ const Messenger: ControllerSchema = {
                 }
             }
             
-            const managerAccount = await ModelControllers['account'].option.model.findOne({ _id: discussion.manager });
+            const managerAccount = await ModelControllers['account'].option?.model.findOne({ _id: discussion.manager });
             Log('managerAccount', {managerAccount});
             if (!managerAccount) {
                 return {
@@ -250,7 +264,7 @@ const Messenger: ControllerSchema = {
                     status: 404
                 }
             }
-            const manager = await ModelControllers['manager'].option.model.findOne({ __key: managerAccount.__key });
+            const manager = await ModelControllers['manager'].option?.model.findOne({ __key: managerAccount.__key });
             Log('manager', {manager});
             if (!managerAccount) {
                 return {
@@ -273,7 +287,7 @@ const Messenger: ControllerSchema = {
 
            
 
-            const reslist = await ModelControllers['discussion']()['list']({
+            const reslist = await ModelControllers['discussion']()['list']?.({
                 ...ctx,
                 service: 'list',
                 __key:user.__key,
@@ -288,9 +302,9 @@ const Messenger: ControllerSchema = {
                 }
             });
             Log('reslist',reslist)
-            if (reslist.error) return reslist;
+            if (!reslist?.response) return reslist;
 
-            const reslist2 = await ModelControllers['discussion']()['list']({
+            const reslist2 = await ModelControllers['discussion']()['list']?.({
                 ...ctx,
                 service: 'list',
                 __key:user.__key,
@@ -305,9 +319,9 @@ const Messenger: ControllerSchema = {
                 }
             });
             Log('reslist2',reslist2);
-            if (reslist2.error) return reslist2
+            if (!reslist2?.error) return reslist2
 
-            const list = await ModelControllers['discussion']()['list']({
+            const list = await ModelControllers['discussion']()['list']?.({
                 ...ctx,
                 service: 'list',
                 __key:ctx.__key,
@@ -321,9 +335,9 @@ const Messenger: ControllerSchema = {
                 }
             });
             Log('list',list);
-            if(list.error) return list;
+            if(!list?.error) return list;
             
-            const reslist3 = await ModelControllers['discussion']()['list']({
+            const reslist3 = await ModelControllers['discussion']()['list']?.({
                 ...ctx,
                 service: 'list',
                 __key:ctx.__key,
@@ -337,7 +351,7 @@ const Messenger: ControllerSchema = {
                 }
             });
             Log('reslist3',reslist3);
-            if (reslist3.error) return reslist3
+            if (!reslist3?.error) return reslist3
 
             await discussion.save();
 
