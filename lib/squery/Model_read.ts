@@ -37,7 +37,7 @@ export const readFactory = (controller: ModelControllerSchema, option: Model_opt
       more,
     });
     if(preRes) return preRes
-    let modelInstance: ModelInstanceSchema;
+    let modelInstance: ModelInstanceSchema|undefined|null;
     try {
       modelInstance = await option.model.__findOne({
         _id: ctx.data.id,

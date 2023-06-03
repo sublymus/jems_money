@@ -27,6 +27,7 @@ export type DataSchema = {
 
 export type ContextSchema = {
   ctrlName: string,
+  authData?: authDataSchema,
   service: string,
   data: DataSchema,
   socket: Socket|null,

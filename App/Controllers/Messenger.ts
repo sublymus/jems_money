@@ -5,10 +5,10 @@ import { ControllerSchema, Controllers, ModelControllers, ModelInstanceSchema, R
 import { Global, SQuery } from "../../lib/squery/SQuery";
 import UserModel from "../Models/UserModel";
 import { UNDIFINED_RESULT } from "../../lib/squery/ModelCtrlManager";
+import DiscussionModel from "../Models/DiscussionModel";
 Log('Messenger','Messenger');
-type  Breaker = (ctx:ContextSchema,instance:ModelInstanceSchema|null|undefined,value?:any,[errorMessage,successMessage]?:[string,string])=>boolean;
 type UNDEFINED = null|undefined;
-const BREAKER_NOT_FOUND :Breaker = (ctx:ContextSchema,instance:ModelInstanceSchema|null|undefined):instance is UNDEFINED=>{
+const BREAKER_NOT_FOUND = (ctx:ContextSchema,instance:ModelInstanceSchema|null|undefined):instance is UNDEFINED=>{
     let err : ResultSchema|undefined;
     if(!instance){
         err ={
@@ -39,7 +39,7 @@ const Messenger: ControllerSchema = {
         const {}=ctx.data;
         try {
             
-            const client:ModelInstanceSchema|null = await ModelControllers[ctx.signup.modelPath].option?.model.__findOne({ 
+            const client= await ModelControllers[ctx.signup.modelPath].option?.model.__findOne({ 
                 _id: ctx.signup.id ,
 
                 
@@ -61,9 +61,8 @@ const Messenger: ControllerSchema = {
             Log('entreprise', {etp});
             if (BREAKER_NOT_FOUND(ctx,etp))return
          
-            const reslistuser = await ModelControllers['discussion']()['list']?.({
+            const reslistuser = await ModelControllers[DiscussionModel.modelName]()['list']?.({
                 ...ctx,
-                service: 'list',
                 __key:client.__key._id.toString(),
                 data: {
                     addNew: [{

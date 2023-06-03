@@ -56,6 +56,11 @@ type SQuerySchema = ((
     ctx?: ContextSchema
   ) => Promise<any>;
   cookies(socket: Socket|null|undefined|string, key?: string, value?: any): Promise<any>;
+  FileType: {
+    url:typeof String,
+    size:typeof Number,
+    extension:typeof String,
+  }
 };
 export const MapUserCtx: MapUserCtxSchema = {};
 export type AllowedModelService = 'create'|'read'|'list'|'update'|'delete';
@@ -166,5 +171,9 @@ SQuery.cookies = SQuery_cookies;
 SQuery.io = SQuery_io;
 SQuery.Schema = SQuery_Schema;
 SQuery.service = SQuery_service;
-
+SQuery.FileType = {
+  url:String,
+  size:Number,
+  extension:String,
+}
 export { SQuery };

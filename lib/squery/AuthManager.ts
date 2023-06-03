@@ -6,8 +6,13 @@ import { SQuery } from "./SQuery";
 
 export class AuthManager {
   login = async (ctx: ContextSchema): ResponseSchema => {
-    const { data, socket, authData: authDataAny } = ctx;
-    const authData: authDataSchema = authDataAny;
+    const { data, socket, authData } = ctx;
+    if (!authData) {
+      return {
+        error: "OPERATION_FAILED",
+        ...(await STATUS.OPERATION_FAILED(ctx)),
+      };
+    }
     let loginModelInstance = null;
     Log("login", ctx.data);
     //console.log('login',ctx.data);
@@ -90,13 +95,19 @@ export class AuthManager {
   };
 
   signup = async (ctx: ContextSchema): ResponseSchema => {
-    let { socket, authData: authDataAny } = ctx;
-    const authData: authDataSchema = authDataAny;
+    let { authData } = ctx;
+    if (!authData) {
+      return {
+        error: "OPERATION_FAILED",
+        ...(await STATUS.OPERATION_FAILED(ctx)),
+      };
+    }
     try {
       authData.extension = authData.extension || [];
       for (let i = 0; i < authData.extension.length; i++) {
         const Ext = authData.extension[i];
         const ext = new Ext();
+
         let confirmed = await ext.confirm(ctx);
 
         if (!confirmed) {

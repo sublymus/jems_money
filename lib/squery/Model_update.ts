@@ -38,7 +38,7 @@ export const updateFactory = (controller: ModelControllerSchema, option: Model_o
     });
     if (preRes) return preRes
 
-    let modelInstance: ModelInstanceSchema;
+    let modelInstance: ModelInstanceSchema|null|undefined;
     const description: DescriptionSchema = option.schema.description;
 
     try {

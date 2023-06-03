@@ -29,7 +29,7 @@ export const listFactory = (controller: ModelControllerSchema, option: Model_opt
       });
     }
     let { paging, addNew, addId, remove } = ctx.data;
-    let parentModelInstance: ModelInstanceSchema|undefined;
+    let parentModelInstance: ModelInstanceSchema|null|undefined;
     more = {
       ...more,
       savedlist: [],

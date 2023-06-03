@@ -56,7 +56,7 @@ const TransactionSchema = SQuery.Schema({
 
   senderFile: [
     {
-      type: String,
+      type: SQuery.FileType,
       file: {
         length: [0, 4],
         type: ["*/*"],
@@ -79,7 +79,7 @@ const TransactionSchema = SQuery.Schema({
 
   managerFile: [
     {
-      type: String,
+      type: SQuery.FileType,
       file: {
         length: [0, 4],
         type: ["*/*"],

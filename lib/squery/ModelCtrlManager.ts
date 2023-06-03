@@ -57,25 +57,9 @@ const MakeModelCtlForm: (
     option.schema.model = option.model;
     option.model.__findOne = async (filter?: any, projection?: any, options?: any, callback?: any): Promise<ModelInstanceSchema> => {
       const instance: ModelInstanceSchema | null | undefined = await option.model.findOne(filter, projection, options, callback);
-      const result: ModelInstanceSchema = {
-        __createdAt: 0,
-        __key: { _id: '' },
-        populate: async() => {},
-        save: async() => {},
-        remove: async() => {},
-        select:async() => {},
-        _id: '',
-        __parentModel: '',
-        __permission: undefined,
-        __signupId: undefined,
-        __updatedAt: 0,
-        __updatedProperty: [],
-        ...instance,
-        id: instance?.__key._id.toString()||'',
-        __modelPath: option.modelPath,
-        __exist: !!instance,
-      }
-      return result
+     
+      //Log('instance',{result});
+      return instance as ModelInstanceSchema;
     }
 
 

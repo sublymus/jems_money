@@ -32,11 +32,11 @@ let AccountSchema = SQuery.Schema({
         }
     },
     imgProfile: [{
-        type: String,
+        type: SQuery.FileType,
         file: {
             size: [1, 1e8],
             length: [0, 4],
-            dir: [Config.conf.rootDir,'fs'],
+            dir: [Config.conf.rootDir,'fs','fa','fb'],
         }
     }]
 });

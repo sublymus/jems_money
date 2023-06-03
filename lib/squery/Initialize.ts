@@ -7,6 +7,11 @@ export type StatusSchema = {
   message: string,
   status: number,
 }
+export type InstanceDataPathsType = {
+  url: string,
+  size: number,
+  extension: string,
+}
 export type FileSchema = {
   type: string;
   size: number;
@@ -147,7 +152,7 @@ export type ModelFrom_optionSchema = {
   }
 };
 
-export type  Model_optionSchema =  ModelFrom_optionSchema & {volatile:boolean, modelPath: string ,model:&{__findOne: (filter?: any, projection?: any, options?: any, callback?: any)=>Promise<ModelInstanceSchema> }}
+export type  Model_optionSchema =  ModelFrom_optionSchema & {volatile:boolean, modelPath: string ,model:&{__findOne: (filter?: any, projection?: any, options?: any, callback?: any)=>Promise<ModelInstanceSchema |null| undefined> }}
 
 export type FilterSchema = {
   [p: string]: any;
@@ -173,7 +178,7 @@ export type ModelInstanceSchema = {
   remove: () => Promise<void>; 
   __modelPath:string,
   id:string;
-  __exist:boolean,
+  __do_not_exist:boolean,
   __key: {
     _id: {
       toString: () => string;

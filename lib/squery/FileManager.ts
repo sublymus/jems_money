@@ -4,10 +4,13 @@ import fs from "node:fs";
 import path from "node:path";
 import Log from "sublymus_logger";
 import { Config } from "./Config";
-import { ContextSchema } from "./Context";
+import { ContextSchema } from "./Context"
+import mime from 'mime-types';
 import {
   FileSchema,
+  InstanceDataPathsType,
   ModelServiceAvailable,
+  RuleSchema,
   TypeRuleSchema,
   UrlDataType,
 } from "./Initialize";
@@ -35,22 +38,23 @@ function isValideType(ruleTypes: string[], type: string): boolean {
   });
   return valide;
 }
+type instanceDataType=  {
+  modelPath: string;
+  id: string;
+  property: string;
+}
 export async function FileValidator(
   ctx: ContextSchema,
   service: ModelServiceAvailable,
   rule: TypeRuleSchema,
-  files: FileSchema[],
-  dataPaths: string[],
-  instanceData: {
-    modelPath: string;
-    id: string;
-    property: string;
-  }
-): Promise<string[]> {
-  rule.file = rule.file||{};
+  files: (FileSchema|InstanceDataPathsType)[],
+  dataPaths: InstanceDataPathsType[],
+  instanceData:instanceDataType
+): Promise<InstanceDataPathsType[]> {
+  rule.file = rule.file || {};
   if (["create", "store", "update"].includes(service)) {
     //console.log(files);
-
+    dataPaths = [...dataPaths];
     if (!files) return [];
     rule.file.type = rule.file.type || ["*/*"];
     rule.file.type = rule.file.type.length == 0 ? ["*/*"] : rule.file.type;
@@ -64,8 +68,8 @@ export async function FileValidator(
     let sizeMax = Array.isArray(rule.file.size)
       ? rule.file.size[1]
       : Number.isInteger(rule.file.size)
-      ? rule.file.size
-      : 10_000_000;
+        ? rule.file.size
+        : 10_000_000;
     sizeMax = sizeMax > 15_000_000 ? 15_000_000 : sizeMax;
     let lengthMin =
       rule.file.length && Array.isArray(rule.file.length)
@@ -75,46 +79,37 @@ export async function FileValidator(
     let lengthMax = Array.isArray(rule.file.length)
       ? rule.file.length[1]
       : Number.isInteger(rule.file.length)
-      ? rule.file.length
-      : 1;
+        ? rule.file.length
+        : 1;
     lengthMax = lengthMax > 1_000 ? 1_000 : lengthMax;
 
     if (files.length < lengthMin || files.length > lengthMax)
       throw new Error(
         " Files.length = " +
-          files.length +
-          "; but must be beetwen [" +
-          lengthMin +
-          "," +
-          lengthMax +
-          "]"
+        files.length +
+        "; but must be beetwen [" +
+        lengthMin +
+        "," +
+        lengthMax +
+        "]"
       );
 
     for (const i in files) {
       if (Object.prototype.hasOwnProperty.call(files, i)) {
         const file = files[i];
+        if(!IsFileData(file)) continue;
         if (file.size < sizeMin || file.size > sizeMax)
           throw new Error(
-            "file.size = " +
-              file.size +
-              "; but must be beetwen [" +
-              sizeMin +
-              "," +
-              sizeMax +
-              "]"
+            "file.size = " + file.size + "; but must be beetwen [" + sizeMin + "," + sizeMax + "]"
           );
         if (!isValideType(rule.file.type, file.type))
           throw new Error(
-            "file.type = " +
-              file.type +
-              "; but is not valide: [" +
-              rule.file.type.toString() +
-              "]"
+            "file.type = " + file.type + "; but is not valide: [" + rule.file.type.toString() + "]"
           );
       }
     }
   }
-  const ruleFileDir = path.join(...rule.file.dir||[]);
+  const ruleFileDir = path.join(...rule.file.dir || []);
   Log("ruleFileDir", { ruleFileDir });
   await new Promise((res, rej) => {
     if (!fs.existsSync(ruleFileDir)) {
@@ -139,123 +134,59 @@ export async function FileValidator(
   Log("ok", "ok");
   const Map = {
     create: async () => {
-      const paths: string[] = [];
+      const newFileData: InstanceDataPathsType[] = [];
       for (const i in files) {
         if (Object.prototype.hasOwnProperty.call(files, i)) {
           const file = files[i];
-          const extension = file.type.split("/").pop();
-          const path =
-            ruleFileDir +
-            "/" +
-            Date.now() +
-            "_" +
-            new mongoose.Types.ObjectId()._id.toString() +
-            "." +
-            extension;
-          fs.writeFileSync(path, file.buffer, file.encoding || "binary");
-          const dataPath =
-            jwt.sign(
-              {
-                realPath: path.replace(Config.conf.rootDir, ""),
-                ...instanceData,
-                createdAt: Date.now(),
-              },
-              Config.conf.URL_KEY||''
-            ) + path.substring(path.lastIndexOf("."));
-          let p =
-            (rule.file?.dir||[]).filter((p, i) => i > 0).join("/") + "/" + dataPath;
-          p = p.startsWith("/") ? p : "/" + p;
-          Log("path**", p);
-          paths.push(p);
+          if(!IsFileData(file)) continue;
+          const data = createPath(file , ruleFileDir , rule , instanceData);
+          newFileData.push(data);
         }
       }
-      Log("paths", "created", paths);
-      return paths;
+      Log("paths", "created", newFileData);
+      return newFileData;
     },
     read: async () => {
       return dataPaths;
     },
     list: async () => {
       return dataPaths;
+
     },
     update: async () => {
-      const paths: string[] = [];
-      for (const i in files) {
-        if (Object.prototype.hasOwnProperty.call(files, i)) {
-          const file = files[i];
-          const extension = file.type.split("/").pop();
-          const path =
-            ruleFileDir +
-            "/" +
-            Date.now() +
-            "_" +
-            new mongoose.Types.ObjectId()._id.toString() +
-            "." +
-            extension;
-          fs.writeFileSync(path, file.buffer, file.encoding || "binary");
-
-          const dataPath =
-            jwt.sign(
-              {
-                realPath: path.replace(Config.conf.rootDir, ""),
-                ...instanceData,
-                createdAt: Date.now(),
-              },
-              Config.conf.URL_KEY||''
-            ) + path.substring(path.lastIndexOf("."));
-          let p =
-           ( rule.file?.dir||[]).filter((p, i) => i > 0).join("/") + "/" + dataPath;
-          p = p.startsWith("/") ? p : "/" + p;
-          Log("path**", p);
-          paths.push(p);
+      const lastOKDataPaths: InstanceDataPathsType[] = [];
+      for (const p in dataPaths) {
+        if (Object.prototype.hasOwnProperty.call(dataPaths,p)) {
+          const data = dataPaths[p];
+          let existe = files.find(file=>{
+            if(IsFileData(file)) return false;
+            return file.url === data.url;
+          });
+          if(!existe){
+            deletePath(data);
+            continue;
+          }
+          lastOKDataPaths.push(data);
         }
       }
 
-      try {
-        dataPaths.forEach((dataPath) => {
-          dataPath = dataPath
-            .substring(dataPath.lastIndexOf("/") + 1)
-            .replace(dataPath.substring(dataPath.lastIndexOf(".")), "");
-          Log("onUpdateData", dataPath);
-          const urlData: UrlDataType = jwt.verify(
-            dataPath,
-            Config.conf.URL_KEY||''
-          ) as UrlDataType;
-          const actualPath = urlData?.realPath;
-          if (!actualPath) return;
-          if (fs.existsSync(Config.conf.rootDir + actualPath)) {
-            fs.unlink(Config.conf.rootDir + actualPath, (err) => {
-              if (err) {
-                Log("important", "can not delete", err);
-              }
-              Log("important", "deleted", actualPath);
-            });
-          }
-        });
-      } catch (error) {}
-      Log("paths", "created", paths);
-      return paths;
+      const newFileData = files.filter((file)=>{
+        if(IsFileData(file)) return true;
+        return !!lastOKDataPaths.find(data=>{
+          return file.url === data.url;
+        })
+      }).map((file)=>{
+        if(!IsFileData(file)) return file;
+        return createPath(file , ruleFileDir , rule , instanceData);
+      });
+
+      
+      Log("paths", "created", {lastOKDataPaths,newFileData});
+      return newFileData;
     },
     delete: async () => {
       dataPaths.forEach((dataPath) => {
-        dataPath = dataPath
-          .substring(dataPath.lastIndexOf("/") + 1)
-          .replace(dataPath.substring(dataPath.lastIndexOf(".")), "");
-        Log("onDeleteData", dataPath);
-        const urlData: UrlDataType = jwt.verify(
-          dataPath,
-          Config.conf.URL_KEY||''
-        ) as UrlDataType;
-        const actualPath = urlData.realPath;
-        if (!actualPath) return;
-        if (fs.existsSync(Config.conf.rootDir + actualPath)) {
-          fs.unlink(Config.conf.rootDir + actualPath, (err) => {
-            if (err) {
-              Log("important", "can not delete", err);
-            }
-            Log("important", "deleted", actualPath);
-          });
-        }
+        deletePath(dataPath);
       });
       return dataPaths;
     },
@@ -264,4 +195,63 @@ export async function FileValidator(
   else if (service == "destroy") service = "delete";
 
   return await Map[service]();
+}
+
+function deletePath(dataPath: InstanceDataPathsType) {
+  const ulr = dataPath.url
+    .substring(dataPath.url.lastIndexOf("/") + 1)
+    .replace(dataPath.url.substring(dataPath.url.lastIndexOf(".")), "");
+  Log("onUpdateData", dataPath);
+  const urlData: UrlDataType = jwt.verify(
+    ulr,
+    Config.conf.URL_KEY || ''
+  ) as UrlDataType;
+  const actualPath = urlData?.realPath;
+  if (!actualPath) return;
+  if (fs.existsSync(Config.conf.rootDir + actualPath)) {
+    fs.unlink(Config.conf.rootDir + actualPath, (err) => {
+      if (err) {
+        Log("important", "can not delete", err);
+      }
+      Log("important", "deleted", actualPath);
+    });
+  }
+}
+
+function IsFileData( file: any) :file is FileSchema{
+  return !!file.buffer ;
+}
+
+function createPath(file:FileSchema , ruleFileDir:string , rule:TypeRuleSchema , instanceData: instanceDataType) {
+  const exts = file.fileName.split(".");
+  const extension = exts[exts.length - 1];
+  const path = ruleFileDir +
+  "/" +
+  Date.now() +
+  "_" +
+  new mongoose.Types.ObjectId()._id.toString() +
+  "." +
+  extension;
+  
+  Log('length',file.buffer?.length);
+    
+  fs.writeFileSync(path, file.buffer, file.encoding || "binary");
+
+  const dataPath =
+    jwt.sign(
+      {
+        realPath: path.replace(Config.conf.rootDir, ""),
+        ...instanceData,
+        createdAt: Date.now(),
+      },
+      Config.conf.URL_KEY || ''
+    ) + "." +extension;
+  let p = (rule.file?.dir || []).filter((p, i) => i > 0).join("/") + "/" + dataPath;
+  p = p.startsWith("/") ? p : "/" + p;
+  Log("path**", p);
+  return  {
+    url:p,
+    size: file.buffer?.length||file.size,
+    extension:extension,
+  }
 }

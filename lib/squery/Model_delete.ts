@@ -41,7 +41,7 @@ export const deleteFactory = (controller: ModelControllerSchema, option: Model_o
             more,
         });
         if (preRes) return preRes
-        let modelInstance: ModelInstanceSchema;
+        let modelInstance: ModelInstanceSchema|null|undefined;
         const description: DescriptionSchema = option.schema.description;
         try {
             modelInstance = await option.model.__findOne({

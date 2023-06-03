@@ -325,7 +325,7 @@ const Transaction: ControllerSchema = {
           status: 404,
         };
       }
-      const transaction: ModelInstanceSchema = await ModelControllers[
+      const transaction = await ModelControllers[
         "transaction"
       ]?.option?.model.__findOne({ _id: ctx.data.id });
       Log("transaction", { transaction });
