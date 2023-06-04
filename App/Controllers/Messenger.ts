@@ -63,7 +63,7 @@ const Messenger: ControllerSchema = {
          
             const reslistuser = await ModelControllers[DiscussionModel.modelName]()['list']?.({
                 ...ctx,
-                __key:client.__key._id.toString(),
+                __key:client.id,
                 data: {
                     addNew: [{
                             client: ctx.login.id,
@@ -81,7 +81,6 @@ const Messenger: ControllerSchema = {
             const discussionId = reslistuser.response.added;
             const reslist = await ModelControllers['discussion']()['list']?.({
                 ...ctx,
-                service: 'list',
                 __key:etp.__key,
                 data: {
                     addId: [...discussionId],

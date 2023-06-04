@@ -55,7 +55,27 @@ export class AuthManager {
         })),
       };
     }
+    try {
+      authData.loginExtension = authData.loginExtension || [];
+      for (let i = 0; i < authData.loginExtension.length; i++) {
+        const Ext = authData.loginExtension[i];
+        const ext = new Ext();
 
+        let confirmed = await ext.confirm(ctx);
+
+        if (!confirmed) {
+          throw new Error(ext.error());
+        }
+      }
+    } catch (error:any) {
+      return {
+        error: "OPERATION FAILED",
+        ...(await STATUS.OPERATION_FAILED(ctx, {
+          target: authData.signup.toLocaleUpperCase(),
+          message: error,
+        })),
+      };
+    }
     const token = {
       __key: loginModelInstance.__key,
       __permission: authData.__permission,
@@ -103,9 +123,9 @@ export class AuthManager {
       };
     }
     try {
-      authData.extension = authData.extension || [];
-      for (let i = 0; i < authData.extension.length; i++) {
-        const Ext = authData.extension[i];
+      authData.signupExtension = authData.signupExtension || [];
+      for (let i = 0; i < authData.signupExtension.length; i++) {
+        const Ext = authData.signupExtension[i];
         const ext = new Ext();
 
         let confirmed = await ext.confirm(ctx);

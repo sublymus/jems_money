@@ -55,32 +55,3 @@ export const SQuery_auth = (authDataOption: authDataOptionSchema) => {
     );
   });
 };
-
-/*
-
-
-  Global.io.on("connection", (socket: any) => {
-    socket.on(`login:${authData.signup}`, async (data: DataSchema, cb: CallBack) => {
-      Log(`login:${authData.signup}`, data);
-      data.__permission = authData.__permission;
-      const authCtrl = new AuthManager();
-      const res = await authCtrl.login({
-        ...(await defineContext(socket, "login", "read", data)),
-        authData,
-      });
-      cb(res);
-    });
-    socket.on(
-      `signup:${authData.signup}`,
-      async (data: DataSchema, cb: CallBack) => {
-        let __key = new mongoose.Types.ObjectId().toString();
-        const authCtrl = new AuthManager();
-        const res = await authCtrl.signup({
-          ...(await defineContext(socket, "signup", "create", data)),
-          authData,
-        });
-        cb(res);
-      }
-    );
-  });
-*/
