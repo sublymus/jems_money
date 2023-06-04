@@ -43,6 +43,15 @@ export const SQuery_Schema = (description: DescriptionSchema , options?:SchemaOp
       type: Schema.Types.ObjectId,
       access: 'public'
     };
+    for (const p in description) {
+      if (Object.prototype.hasOwnProperty.call(description, p)) {
+        const rule = description[p];
+        if(Array.isArray(rule) && rule[0].type === SQuery.FileType){
+          if(!rule[0].file)
+           rule[0].file = {};
+        }
+      }
+    }
     const schema = new Schema(description as any,{
       ...options
     });
