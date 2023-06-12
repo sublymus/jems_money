@@ -29,7 +29,13 @@ const TransactionSchema = SQuery.Schema({
   carte: {
     type: String,
   },
-  agence: {
+  agenceReceiver: {
+    type: Schema.Types.ObjectId,
+    ref: "agence",
+    strictAlien: true,
+    impact: false,
+  },
+  agenceSender: {
     type: Schema.Types.ObjectId,
     ref: "agence",
     strictAlien: true,
@@ -48,8 +54,18 @@ const TransactionSchema = SQuery.Schema({
     minlength: [3, "trop court"],
     maxlength: [20, "trop long"],
   },
-  sum: {
-    type: Number,
+  received: {
+    type: {
+      value: Number,
+      currency: String,
+    },
+    access: "admin",
+  },
+  sent: {
+    type: {
+      value: Number,
+      currency: String,
+    },
     access: "admin",
   },
   //full
@@ -61,7 +77,7 @@ const TransactionSchema = SQuery.Schema({
         length: [0, 4],
         type: ["*/*"],
         size: [1, 4e7],
-        dir: [Config.conf.rootDir, "/fs"],
+        dir: [Config.conf.rootDir, "fs"],
       },
       access: "admin",
     },
@@ -84,7 +100,7 @@ const TransactionSchema = SQuery.Schema({
         length: [0, 4],
         type: ["*/*"],
         size: [0, 4e7],
-        dir: [Config.conf.rootDir, "/fs"],
+        dir: [Config.conf.rootDir, "fs"],
       },
       access: "admin",
     },

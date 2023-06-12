@@ -5,7 +5,6 @@ import { CtrlManager } from "../../lib/squery/CtrlManager";
 import {
   ControllerSchema,
   ModelControllers,
-  ModelInstanceSchema,
   ResponseSchema,
 } from "../../lib/squery/Initialize";
 
@@ -56,7 +55,6 @@ const Transaction: ControllerSchema = {
     }
 
     // (await transactions.page()).items.length;
-
     // const resCurrent = await ModelControllers["transaction"]()["list"]({
     //   ...ctx,
     //   service: "list",
@@ -140,6 +138,9 @@ const Transaction: ControllerSchema = {
     };
   },
   full: async (ctx: ContextSchema): ResponseSchema => {
+    const {
+      data: { id },
+    } = ctx;
     console.log("🚀 ~ file: Transaction.ts:113 ~ full: ~ ctx:", ctx.data);
     const lastVal = "start",
       newVal = "full";
@@ -148,37 +149,6 @@ const Transaction: ControllerSchema = {
       ...ctx,
       __permission: "admin",
       service: "update",
-      data: ctx.data,
-      // {
-
-      // id: ctx.data.id,
-      // receiverContact: ctx.data.receiverContact,
-      // sum: ctx.data.sum,
-      // codePromo: ctx.data.codePromo,
-      // senderFile:ctx.data.senderFile
-      // country: {
-      //     type: Schema.Types.ObjectId,
-      //     ref: CountryModel.modelName,
-      //     strictAlien: true,
-      //     impact: false,
-      // },
-      // telephone: {
-      //     type: String,
-      // },
-      // carte: {
-      //     type: String
-      // },
-      // agence: {
-      //     type: Schema.Types.ObjectId,
-      //     ref: 'agence',
-      //     strictAlien: true,
-      //     impact: false,
-      // },
-      // typeTransaction: {
-      //     type: String,
-      // },
-      //
-      // }
     });
 
     if (!res?.response) return res;
@@ -186,11 +156,15 @@ const Transaction: ControllerSchema = {
     const transaction = await ModelControllers[
       "transaction"
     ]?.option?.model.findOne({
-      _id: ctx.data.id,
+      _id: id,
     });
     console.log("🚀 ~ file: Transaction.ts:162 ~ full: ~ ctx.data:", ctx.data);
+    console.log(
+      "🚀 ~ file: Transaction.ts:158 ~ full: ~ transaction:",
+      transaction
+    );
 
-    if (!transaction) {
+    if (!transaction.received) {
       return {
         error: "Transaction_full",
         code: "NOT_FOUND",
@@ -198,7 +172,7 @@ const Transaction: ControllerSchema = {
         status: 404,
       };
     }
-    if (!transaction.sum) {
+    if (!transaction.sent) {
       return {
         error: "Transaction_new",
         code: "NOT_FOUND",
@@ -206,15 +180,12 @@ const Transaction: ControllerSchema = {
         status: 404,
       };
     }
-    if (!transaction.receiverContact) {
-      return {
-        error: "Transaction_new",
-        code: "NOT_FOUND",
-        message: "transaction.receiverContact don't exist",
-        status: 404,
-      };
-    }
-    if (!transaction.senderFile || transaction.senderFile.length == 0) {
+    console.log(
+      !transaction.senderFile || transaction.senderFile.length === 0,
+      "isTRueorFAlse"
+    );
+
+    if (!transaction.senderFile || transaction.senderFile.length === 0) {
       return {
         error: "Transaction_new",
         code: "NOT_FOUND",
@@ -230,7 +201,9 @@ const Transaction: ControllerSchema = {
         status: 404,
       };
     }
-    if (!transaction.telephone || transaction.carte) {
+    console.log(!transaction.telephone || !transaction.carte, transaction);
+
+    if (!(transaction.telephone || transaction.carte)) {
       return {
         error: "Transaction_new",
         code: "NOT_FOUND",
@@ -238,11 +211,19 @@ const Transaction: ControllerSchema = {
         status: 404,
       };
     }
-    if (!transaction.agence) {
+    if (!transaction.agenceReceiver) {
       return {
         error: "Transaction_new",
         code: "NOT_FOUND",
-        message: "transaction.agence don't exist",
+        message: "transaction.agenceReceiver don't exist",
+        status: 404,
+      };
+    }
+    if (!transaction.agenceSender) {
+      return {
+        error: "Transaction_new",
+        code: "NOT_FOUND",
+        message: "transaction.agenceSender don't exist",
         status: 404,
       };
     }
@@ -268,7 +249,7 @@ const Transaction: ControllerSchema = {
       __permission: "admin",
       service: "update",
       data: {
-        id: ctx.data.id,
+        id: id,
         status: transaction.manager ? "run" : newVal,
       },
     });
@@ -276,7 +257,7 @@ const Transaction: ControllerSchema = {
     return {
       code: "OPERATION_SUCCESS",
       message: "OPERATION_SUCCESS",
-      response: ctx.data.id,
+      response: id,
       status: 200,
     };
   },
@@ -410,7 +391,7 @@ const Transaction: ControllerSchema = {
         response: ctx.data.id,
         status: 200,
       };
-    } catch (error:any) {
+    } catch (error: any) {
       return {
         error: "SERVER_ERROR",
         code: "SERVER_ERROR",
@@ -475,7 +456,7 @@ const Transaction: ControllerSchema = {
         },
       });
       return res;
-    } catch (error:any) {
+    } catch (error: any) {
       return {
         error: "SERVER_ERROR",
         code: "SERVER_ERROR",
@@ -533,7 +514,7 @@ const Transaction: ControllerSchema = {
       });
       Log("res", res?.response);
       return res;
-    } catch (error:any) {
+    } catch (error: any) {
       return {
         error: "SERVER_ERROR",
         code: "SERVER_ERROR",

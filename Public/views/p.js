@@ -28,7 +28,6 @@ export const load = {
   },
   entreprise: {
     create: {
-      transactions: [],
       managers: [
         {
           account: {
@@ -80,7 +79,6 @@ export const load = {
             carte: "9856876509871001",
             imgProfile: [],
           },
-          contacts: [{}, {}, {}],
           transactions: [],
           messenger: {
             opened: [],
