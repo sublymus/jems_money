@@ -5,6 +5,8 @@ import { SQuery } from "../../lib/squery/SQuery";
 import AccountModel from "./AccountModel";
 import CountryModel from "./CountryModel";
 import DiscussionModel from "./DiscussionModel";
+import EntrepriseModel from "./EntrepriseModel";
+import { ModelControllers, ModelInstanceSchema } from "../../lib/squery/Initialize";
 
 const TransactionSchema = SQuery.Schema({
   /// start
@@ -15,6 +17,17 @@ const TransactionSchema = SQuery.Schema({
     strictAlien: true,
     access: "admin",
   },
+  /*
+  const accountSchema = new Schema({  
+    name: String,
+    phone: Number,
+  })
+  const userSchema = new Schema({  
+    account: {
+    type: Schema.Types.ObjectId,
+    ref: 'account',
+  }})
+  */
   //full
   country: {
     type: Schema.Types.ObjectId,
@@ -126,5 +139,31 @@ const maker = MakeModelCtlForm({
   model: TransactionModel,
   schema: TransactionSchema,
 });
+
+maker.post('store', async ({ ctx , res }) => {
+  const entrepise = await EntrepriseModel.findOne<ModelInstanceSchema>();
+  
+  if (!entrepise) {
+    return {
+      code: '',
+      message: "",
+      status: 0,
+      error: 'Ke dal'
+    }
+  }
+  const resListCM = await ModelControllers["transaction"]()["list"]?.({
+    ...ctx,
+    __permission: "admin",
+    __key: ctx.__key,
+    data: {
+      addId: [res.response.toString()],
+      paging: {
+        query: {
+          __parentModel: `entreprise_${entrepise._id.toString()}_allTransactions_transaction`,
+        },
+      },
+    },
+  });
+})
 
 export default TransactionModel;

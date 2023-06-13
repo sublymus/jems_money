@@ -524,10 +524,10 @@ const Transaction: ControllerSchema = {
       };
     }
   },
-  list: async (ctx: ContextSchema): ResponseSchema => {
+  search: async (ctx: ContextSchema): ResponseSchema => {
 
     try {
-      const {filter} = ctx.data;
+      const {filter , populate , projection} = ctx.data;
 
     if (ctx.signup.modelPath != "manager") {
       return {
@@ -537,11 +537,11 @@ const Transaction: ControllerSchema = {
         status: 404,
       };
     }
-    const listTransaction : Array <any>= await ModelControllers["transaction"]?.option?.model.find(filter);
+    const listTransaction : Array <any>= await ModelControllers["transaction"]?.option?.model.find(filter||{}).populate(populate||{})
 
-    for (const instance of listTransaction) {
-      await  formatModelInstance(ctx,'read','transaction',instance);
-    }
+    // for (const instance of listTransaction) {
+    //   await  formatModelInstance(ctx,'read','transaction',instance);
+    // }
 
     return {
       response: listTransaction,
@@ -587,6 +587,7 @@ async function updateTransaction(
       status: 404,
     };
   }
+
   const res = await ModelControllers["transaction"]()["update"]?.({
     ...ctx,
     __permission: "admin",

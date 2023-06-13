@@ -16,6 +16,15 @@ const EntrepriseSchema = SQuery.Schema({
       impact: false,
     },
   ],
+  allTransactions: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: TransactionModel.modelName,
+      strictAlien: true,
+      impact: false,
+      access:"admin"
+    },
+  ],
   managers: [
     {
       type: Schema.Types.ObjectId,
