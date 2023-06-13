@@ -10,6 +10,10 @@ import { access } from "fs";
 
 const managerSchema = SQuery.Schema({
   ...(UserModel.schema as any).description,
+  isFirst:{
+    type:Boolean,
+    default:false
+  },
   entreprise:{
     type:Schema.Types.ObjectId,
     ref:'entreprise',
