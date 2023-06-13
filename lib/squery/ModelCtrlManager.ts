@@ -79,7 +79,8 @@ const MakeModelCtlForm: (
 
       for (const listener of EventManager[e.ctx.service].pre) {
         try {
-          if (listener) return await listener(e);
+          const res = await listener(e);
+          if(res) return res;
         } catch (error) {
           Log("ERROR_callPre", error);
         }
@@ -93,13 +94,17 @@ const MakeModelCtlForm: (
         for (const listener of EventManager[e.ctx.service].post) {
           if (listener){
             const r = await listener(e);
+            Log('res__', r);
+            
             if(r) return r ;
           }  
         }
+        Log('res__', e.res);
         return e.res;
       } catch (error) {
         Log("ERROR_callPost", error);
       }
+      Log('res__', e.res);
       return e.res;
     };
     const ctrlMaker = function () {
@@ -169,7 +174,7 @@ const MakeModelCtlForm: (
 async function formatModelInstance(
   ctx: ContextSchema,
   service: ModelServiceAvailable,
-  option: ModelFrom_optionSchema & { modelPath: string },
+  modelPath: string,
   modelInstance: ModelInstanceSchema
 ) {
   const info: PopulateSchema = {
@@ -179,7 +184,7 @@ async function formatModelInstance(
   deepPopulate(
     ctx,
     service,
-    option.model.modelName,
+    modelPath,
     info,
     modelInstance.__key._id.toString() == ctx.__key
   );
@@ -227,6 +232,7 @@ function deepPopulate(
 
       };
       if (!Array.isArray(rule)) {
+        rule
         if (
           !accessValidator({
             ctx,
@@ -285,7 +291,7 @@ async function backDestroy(ctx: ContextSchema, more: MoreSchema) {
     return p?promises.push(p):promises;
   });
   const log = await Promise.allSettled(promises);
-  console.log(log);
+  Log('backDestroy',log);
 
   more.savedlist = [];
   return;

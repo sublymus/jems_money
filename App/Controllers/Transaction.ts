@@ -7,6 +7,7 @@ import {
   ModelControllers,
   ResponseSchema,
 } from "../../lib/squery/Initialize";
+import { formatModelInstance } from "../../lib/squery/ModelCtrlManager";
 
 const Transaction: ControllerSchema = {
   start: async (ctx: ContextSchema): ResponseSchema => {
@@ -523,6 +524,41 @@ const Transaction: ControllerSchema = {
       };
     }
   },
+  list: async (ctx: ContextSchema): ResponseSchema => {
+
+    try {
+      const {filter} = ctx.data;
+
+    if (ctx.signup.modelPath != "manager") {
+      return {
+        error: "Only manager can user this service",
+        code: "Only manager can user this service",
+        message: "Only manager can user this service",
+        status: 404,
+      };
+    }
+    const listTransaction : Array <any>= await ModelControllers["transaction"]?.option?.model.find(filter);
+
+    for (const instance of listTransaction) {
+      await  formatModelInstance(ctx,'read','transaction',instance);
+    }
+
+    return {
+      response: listTransaction,
+      code: "OPERATION_SUCCESS",
+      message: "OPERATION_SUCCESS",
+      status: 200,
+    };
+    } catch (error:any) {
+      return {
+        error: "SERVER_ERROR",
+        code: "SERVER_ERROR",
+        message: error.message,
+        status: 502,
+      };
+    }
+    
+  },
 };
 
 async function updateTransaction(
@@ -570,3 +606,4 @@ const ctrlMaker = CtrlManager({
 });
 
 ctrlMaker.post("like", async (e) => {});
+

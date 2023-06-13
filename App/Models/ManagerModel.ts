@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { SQueryMongooseSchema } from "../../lib/squery/Initialize";
+import { ModelControllers, SQueryMongooseSchema } from "../../lib/squery/Initialize";
 import { MakeModelCtlForm } from "../../lib/squery/ModelCtrlManager";
 import { SQuery } from "../../lib/squery/SQuery";
 import UserModel from "./UserModel";
@@ -47,6 +47,27 @@ export const ManagerModel = mongoose.model("manager", managerSchema);
 const maker = MakeModelCtlForm({
   model: ManagerModel,
   schema: managerSchema,
+});
+
+maker.pre('store', async ({ ctx }) => {
+
+  const first = await ModelControllers["manager"]?.option?.model.findOne({
+    isFirst: true
+  });
+  if (!first) {
+    ctx.__permission = 'admin';
+    ctx.data.isFirst = true;
+    return
+  };
+
+  if (first.__key.toString() != ctx.__key) {
+    return {
+      error: 'You don\'t have a perssion to create a manager',
+      code: "Manager Account Not Created",
+      message: 'You don\'t have a perssion to create a manager',
+      status: 404,
+    }
+  }
 });
 maker.tools.assigneToNewListElement({
   parentModelPath: 'entreprise',
